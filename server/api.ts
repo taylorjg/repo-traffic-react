@@ -1,9 +1,9 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import express from 'express'
 
-const parseLinkHeader = (response: express.Response) => {
-  const linkHeader = response.getHeaders()['link']
-  if (typeof linkHeader !== 'string' || !linkHeader) {
+const parseLinkHeader = (response: AxiosResponse) => {
+  const linkHeader = response.headers['link']
+  if (!linkHeader) {
     return []
   }
   return linkHeader
@@ -12,12 +12,22 @@ const parseLinkHeader = (response: express.Response) => {
     .map(([hrefPart, relPart]) => {
       const hrefMatch = /^<([^>]+)>$/.exec(hrefPart ?? '')
       const relMatch = /^rel="([^"]+)"$/.exec(relPart ?? '')
-      if (!hrefMatch || !relMatch) return null
-      const href = hrefMatch[1]
-      const rel = relMatch[1]
+      const href = hrefMatch?.[1] ?? ''
+      const rel = relMatch?.[1] ?? ''
       return { href, rel }
     })
-    .filter(Boolean)
+}
+
+async function* getPagesGen(url: string, config: AxiosRequestConfig): AsyncGenerator {
+  console.log('[getPagesGen]', 'url:', url)
+  const response = await axios.get(url, config)
+  const repos = response.data
+  yield* repos
+  const links = parseLinkHeader(response)
+  const nextLink = links.find(({ rel }) => rel === 'next')
+  if (nextLink) {
+    yield* getPagesGen(nextLink.href, config)
+  }
 }
 
 export const configureApi = (username: string, token: string) => {
@@ -33,8 +43,11 @@ export const configureApi = (username: string, token: string) => {
         per_page: 100
       }
     }
-    const { data } = await axios.get(url, config)
-    res.send(data)
+    const repos = []
+    for await (const repo of getPagesGen(url, config)) {
+      repos.push(repo)
+    }
+    res.send(repos)
   }
 
   const apiRouter = express.Router()
