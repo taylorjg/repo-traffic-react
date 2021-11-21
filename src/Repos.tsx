@@ -1,15 +1,19 @@
+import axios from 'axios'
 import { useQuery } from 'react-query'
 import TableRow from './TableRow'
 
 const Repos = () => {
 
-  const { isLoading, error, data } = useQuery('', () => fetch('/api/repos').then(res => res.json()))
+  const { isLoading, error, data } = useQuery<any, Error>('getRepos', () => axios.get('/api/repos').then(({ data }) => data))
   console.log({ isLoading, error, data })
 
-  if (isLoading) return <div>'Loading...'</div>
+  if (isLoading) return (
+    <div>'Loading...'</div>
+  )
 
-  // if (error) return 'An error has occurred: ' + error.message
-  if (error) return <div>'An error has occurred'</div>
+  if (error) return (
+    <div>'An error has occurred: ' {error.message}</div>
+  )
 
   return (
     <table>
