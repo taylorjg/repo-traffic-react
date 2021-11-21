@@ -1,9 +1,12 @@
 {
   "name": "repo-traffic-react",
   "description": "Display GitHub repo traffic data using React and TypeScript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.6.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.1.1",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
