@@ -48,13 +48,6 @@ async function* splitEvery<T>(xs: AsyncGenerator<T>, n: number): AsyncGenerator<
   }
 }
 
-const displayRateLimitData = async () => {
-  const { data } = await axios.get('/rate_limit')
-  console.log(`rate limit: ${data.resources.core.limit}`)
-  console.log(`rate remaining: ${data.resources.core.remaining}`)
-  console.log(`rate reset: ${new Date(data.resources.core.reset * 1000)}`)
-}
-
 async function* getPagesGen(url: string, config: AxiosRequestConfig): AsyncGenerator<any> {
   console.log('[getPagesGen]', 'url:', url)
   try {
@@ -64,14 +57,32 @@ async function* getPagesGen(url: string, config: AxiosRequestConfig): AsyncGener
     const links = parseLinkHeader(response)
     const nextLink = links.find(({ rel }) => rel === 'next')
     if (nextLink) {
-      // yield* getPagesGen(nextLink.href, config)
+      yield* getPagesGen(nextLink.href, config)
     }
   } catch (error) {
     console.log(getErrorMessage(error as Error))
   }
 }
 
-export const configureApi = (username: string, token: string) => {
+async function* getPageGen(url: string, config: AxiosRequestConfig): AsyncGenerator<any> {
+  console.log('[getPageGen]', 'url:', url)
+  try {
+    const response = await axios.get(url, config)
+    const repos = response.data
+    yield* repos
+  } catch (error) {
+    console.log(getErrorMessage(error as Error))
+  }
+}
+
+const displayRateLimitData = async () => {
+  const { data } = await axios.get('/rate_limit')
+  console.log(`rate limit: ${data.resources.core.limit}`)
+  console.log(`rate remaining: ${data.resources.core.remaining}`)
+  console.log(`rate reset: ${new Date(data.resources.core.reset * 1000)}`)
+}
+
+export const configureApi = (username: string, token: string, repoLimit: number) => {
 
   axios.defaults.baseURL = 'https://api.github.com'
   axios.defaults.headers.common['Accept'] = 'application/vnd.github.v3+json'
@@ -82,10 +93,10 @@ export const configureApi = (username: string, token: string) => {
     const url = `/users/${username}/repos`
     const config = {
       params: {
-        per_page: 5 // 100
+        per_page: repoLimit > 0 ? repoLimit : 100
       }
     }
-    const asyncIter = getPagesGen(url, config)
+    const asyncIter = repoLimit > 0 ? getPageGen(url, config) : getPagesGen(url, config)
     const CHUNK_SIZE = 50
     const results: any[] = []
     for await (const reposChunk of splitEvery(asyncIter, CHUNK_SIZE)) {

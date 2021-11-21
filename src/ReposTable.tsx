@@ -1,5 +1,5 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import axios from 'axios'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { useQuery } from 'react-query'
 import RepoRow from './RepoRow'
 import { Item } from './types'
@@ -16,6 +16,13 @@ const ReposTable = () => {
     <div>An error has occurred: {error.message}</div>
   )
 
+  const filteredItems = items.filter(item => (
+    item.views.count > 0 ||
+    item.clones.count > 0 ||
+    item.repo.forks_count > 0 ||
+    item.repo.stargazers_count > 0
+  ))
+
   return (
     <TableContainer>
       <Table size="small">
@@ -31,7 +38,7 @@ const ReposTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {items.map((item: Item) => <RepoRow key={item.repo.id} item={item} />)}
+          {filteredItems.map((item: Item) => <RepoRow key={item.repo.id} item={item} />)}
         </TableBody>
       </Table>
     </TableContainer>
