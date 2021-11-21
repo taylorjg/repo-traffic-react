@@ -1,6 +1,7 @@
 {
   "name": "repo-traffic-react",
-  "version": "0.1.0",
+  "description": "Display GitHub repo traffic data using React and TypeScript",
+  "version": "0.0.2",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.15.0",

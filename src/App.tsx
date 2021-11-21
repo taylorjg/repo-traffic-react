@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import Repos from './Repos'
+import Version from './Version'
 import './App.css'
 
 const queryClient = new QueryClient({
@@ -12,12 +13,12 @@ const queryClient = new QueryClient({
   }
 })
 
-function App() {
-
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="App">
         <Repos />
+        <Version />
       </div>
     </QueryClientProvider>
   )
