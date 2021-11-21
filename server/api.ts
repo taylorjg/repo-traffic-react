@@ -1,6 +1,22 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import express from 'express'
 
+const getErrorMessage = (error: Error) => {
+  const response = (error as any).response as AxiosResponse
+  if (response) {
+    const status = response.status
+    const statusText = response.statusText
+    if (response.data && response.data.message) {
+      return `status: ${status}; statusText: ${statusText}; message: ${response.data.message}`
+    }
+    else {
+      return `status: ${status}; statusText: ${statusText}; message: ${error.message}`
+    }
+  } else {
+    return `message: ${error.message}`
+  }
+}
+
 const parseLinkHeader = (response: AxiosResponse) => {
   const linkHeader = response.headers['link']
   if (!linkHeader) {
@@ -32,15 +48,26 @@ async function* splitEvery<T>(xs: AsyncGenerator<T>, n: number): AsyncGenerator<
   }
 }
 
+const displayRateLimitData = async () => {
+  const { data } = await axios.get('/rate_limit')
+  console.log(`rate limit: ${data.resources.core.limit}`)
+  console.log(`rate remaining: ${data.resources.core.remaining}`)
+  console.log(`rate reset: ${new Date(data.resources.core.reset * 1000)}`)
+}
+
 async function* getPagesGen(url: string, config: AxiosRequestConfig): AsyncGenerator<any> {
   console.log('[getPagesGen]', 'url:', url)
-  const response = await axios.get(url, config)
-  const repos = response.data
-  yield* repos
-  const links = parseLinkHeader(response)
-  const nextLink = links.find(({ rel }) => rel === 'next')
-  if (nextLink) {
-    yield* getPagesGen(nextLink.href, config)
+  try {
+    const response = await axios.get(url, config)
+    const repos = response.data
+    yield* repos
+    const links = parseLinkHeader(response)
+    const nextLink = links.find(({ rel }) => rel === 'next')
+    if (nextLink) {
+      // yield* getPagesGen(nextLink.href, config)
+    }
+  } catch (error) {
+    console.log(getErrorMessage(error as Error))
   }
 }
 
@@ -51,10 +78,11 @@ export const configureApi = (username: string, token: string) => {
   axios.defaults.headers.common['Authorization'] = `token ${token}`
 
   const getRepos = async (_req: express.Request, res: express.Response) => {
+    displayRateLimitData()
     const url = `/users/${username}/repos`
     const config = {
       params: {
-        per_page: 100
+        per_page: 5 // 100
       }
     }
     const asyncIter = getPagesGen(url, config)
