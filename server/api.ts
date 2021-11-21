@@ -96,6 +96,7 @@ export const configureApi = (username: string, token: string) => {
       reposChunk.forEach((repo: any, index: number) => {
         results.push({
           repo: {
+            id: repo.id,
             name: repo.name,
             description: repo.description,
             stargazers_count: repo.stargazers_count,

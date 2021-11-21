@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query'
+import TableRow from './TableRow'
 
 const Repos = () => {
 
@@ -11,7 +12,18 @@ const Repos = () => {
   if (error) return <div>'An error has occurred'</div>
 
   return (
-    <div>data.length: {data.length}</div>
+    <table>
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>forks</th>
+          <th>stars</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((item: any) => <TableRow key={item.repo.id} item={item} />)}
+      </tbody>
+    </table>
   )
 }
 
