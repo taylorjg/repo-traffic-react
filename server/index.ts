@@ -4,7 +4,6 @@ import path from 'path'
 import { configureApi } from './api'
 
 const BUILD_FOLDER = path.resolve(__dirname, '..', 'build')
-console.log('BUILD_FOLDER:', BUILD_FOLDER)
 
 const username = process.env.GITHUB_USERNAME
 const token = process.env.GITHUB_TOKEN
