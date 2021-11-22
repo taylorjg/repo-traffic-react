@@ -12,10 +12,10 @@ export type Item = {
   },
   clones: {
     count: number,
-    unique: number
+    uniques: number
   },
   views: {
     count: number,
-    unique: number
+    uniques: number
   }
 }

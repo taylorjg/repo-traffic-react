@@ -34,7 +34,7 @@ const parseLinkHeader = (response: AxiosResponse) => {
     })
 }
 
-async function* splitEvery<T>(xs: AsyncGenerator<T>, n: number): AsyncGenerator<T[]> {
+async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): AsyncGenerator<T[]> {
   let chunk: T[] = []
   for await (const x of xs) {
     chunk.push(x)
@@ -97,9 +97,9 @@ export const configureApi = (username: string, token: string, repoLimit: number)
       }
     }
     const asyncIter = repoLimit > 0 ? getPageGen(url, config) : getPagesGen(url, config)
-    const CHUNK_SIZE = 50
+    const CHUNK_SIZE = 100
     const results: any[] = []
-    for await (const reposChunk of splitEvery(asyncIter, CHUNK_SIZE)) {
+    for await (const reposChunk of asyncSplitEvery(asyncIter, CHUNK_SIZE)) {
       console.log('[getRepos]', 'reposChunk.length:', reposChunk.length)
       const viewsPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
       const clonesPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))

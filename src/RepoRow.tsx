@@ -10,9 +10,9 @@ const RepoRow: React.FC<RepoRowProps> = ({ item }) => {
     <TableRow>
       <TableCell>{item.repo.name}</TableCell>
       <TableCell>{item.views.count}</TableCell>
-      <TableCell>{item.views.unique}</TableCell>
+      <TableCell>{item.views.uniques}</TableCell>
       <TableCell>{item.clones.count}</TableCell>
-      <TableCell>{item.clones.unique}</TableCell>
+      <TableCell>{item.clones.uniques}</TableCell>
       <TableCell>{item.repo.forks_count}</TableCell>
       <TableCell>{item.repo.stargazers_count}</TableCell>
     </TableRow>
