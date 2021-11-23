@@ -1,6 +1,6 @@
 import { Container, CssBaseline } from '@mui/material'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import RepoTrafficTable from './RepoTrafficTable'
+import RepoTraffic from './RepoTraffic'
 import Version from './Version'
 import './App.css'
 
@@ -20,7 +20,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <CssBaseline />
       <Container className="app">
-        <RepoTrafficTable />
+        <RepoTraffic />
         <Version />
       </Container>
     </QueryClientProvider>
