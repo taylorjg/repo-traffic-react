@@ -25,10 +25,10 @@ const RepoTrafficTable = () => {
   }
 
   const filteredRows = rows.filter(row => (
-    row.views.count > 0 ||
-    row.clones.count > 0 ||
-    row.repo.forks_count > 0 ||
-    row.repo.stargazers_count > 0
+    row.viewsCount > 0 ||
+    row.clonesCount > 0 ||
+    row.forksCount > 0 ||
+    row.starsCount > 0
   ))
 
   const anchorOrigin: SnackbarOrigin = {
@@ -54,7 +54,7 @@ const RepoTrafficTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRows.map((repoData: RepoData) => <RepoTrafficTableRow key={repoData.repo.id} repoData={repoData} />)}
+            {filteredRows.map((repoData: RepoData) => <RepoTrafficTableRow key={repoData.id} repoData={repoData} />)}
           </TableBody>
         </Table>
       </TableContainer>

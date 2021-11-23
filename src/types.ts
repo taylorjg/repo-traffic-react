@@ -1,21 +1,15 @@
 export type RepoData = {
-  repo: {
-    id: number,
-    name: string,
-    description: string,
-    language: string,
-    htmlUrl: string,
-    forks_count: number,
-    stargazers_count: number,
-    createdAt: string,
-    updatedAt: string
-  },
-  clones: {
-    count: number,
-    uniques: number
-  },
-  views: {
-    count: number,
-    uniques: number
-  }
+  id: number,
+  name: string,
+  description: string,
+  language: string,
+  htmlUrl: string,
+  createdAt: string,
+  updatedAt: string
+  forksCount: number,
+  starsCount: number,
+  viewsCount: number,
+  viewsUniques: number,
+  clonesCount: number,
+  clonesUniques: number
 }

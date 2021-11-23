@@ -103,22 +103,24 @@ export const configureApi = (username: string, token: string, repoLimit: number)
       console.log('[getRepos]', 'reposChunk.length:', reposChunk.length)
       const viewsPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
       const clonesPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
-      const fred = await Promise.all([...viewsPromises, ...clonesPromises])
+      const responses = await Promise.all([...viewsPromises, ...clonesPromises])
+      const viewsResponses = responses.slice(0, reposChunk.length)
+      const clonesResponses = responses.slice(reposChunk.length)
       reposChunk.forEach((repo: any, index: number) => {
         results.push({
-          repo: {
-            id: repo.id,
-            name: repo.name,
-            description: repo.description,
-            stargazers_count: repo.stargazers_count,
-            forks_count: repo.forks_count,
-            created_at: repo.created_at,
-            updated_at: repo.updated_at,
-            html_url: repo.html_url,
-            language: repo.language
-          },
-          views: fred[index].data,
-          clones: fred[index + reposChunk.length].data
+          id: repo.id,
+          name: repo.name,
+          description: repo.description,
+          created_at: repo.created_at,
+          updated_at: repo.updated_at,
+          html_url: repo.html_url,
+          language: repo.language,
+          starsCount: repo.stargazers_count,
+          forksCount: repo.forks_count,
+          viewsCount: viewsResponses[index].data.count,
+          viewsUniques: viewsResponses[index].data.uniques,
+          clonesCount: clonesResponses[index].data.count,
+          clonesUniques: clonesResponses[index].data.uniques
         })
       })
     }
