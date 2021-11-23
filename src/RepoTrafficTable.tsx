@@ -2,13 +2,13 @@ import axios from 'axios'
 import { useState } from 'react'
 import { Alert, LinearProgress, Snackbar, SnackbarOrigin, Slide, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { useQuery } from 'react-query'
-import Toolbar from './Toolbar'
-import RepoRow from './RepoRow'
-import { Item } from './types'
+import RepoTrafficToolbar from './RepoTrafficToolbar'
+import RepoTrafficTableRow from './RepoTrafficTableRow'
+import { RepoData } from './types'
 
-const ReposTable = () => {
+const RepoTrafficTable = () => {
 
-  const { isLoading, error, data: items = [] } = useQuery<Item[], Error>(
+  const { isLoading, error, data: rows = [] } = useQuery<RepoData[], Error>(
     'getRepos',
     () => axios.get('/api/repos').then(({ data }) => data))
 
@@ -24,11 +24,11 @@ const ReposTable = () => {
     setErrorShown(true)
   }
 
-  const filteredItems = items.filter(item => (
-    item.views.count > 0 ||
-    item.clones.count > 0 ||
-    item.repo.forks_count > 0 ||
-    item.repo.stargazers_count > 0
+  const filteredRows = rows.filter(row => (
+    row.views.count > 0 ||
+    row.clones.count > 0 ||
+    row.repo.forks_count > 0 ||
+    row.repo.stargazers_count > 0
   ))
 
   const anchorOrigin: SnackbarOrigin = {
@@ -38,7 +38,7 @@ const ReposTable = () => {
 
   return (
     <>
-      <Toolbar />
+      <RepoTrafficToolbar />
       <LinearProgress sx={{ visibility: isLoading ? 'visible' : 'hidden', mb: '1rem' }} />
       <TableContainer>
         <Table size="small">
@@ -54,7 +54,7 @@ const ReposTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredItems.map((item: Item) => <RepoRow key={item.repo.id} item={item} />)}
+            {filteredRows.map((repoData: RepoData) => <RepoTrafficTableRow key={repoData.repo.id} repoData={repoData} />)}
           </TableBody>
         </Table>
       </TableContainer>
@@ -73,4 +73,4 @@ const ReposTable = () => {
   )
 }
 
-export default ReposTable
+export default RepoTrafficTable

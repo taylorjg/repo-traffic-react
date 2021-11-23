@@ -1,4 +1,4 @@
-export type Item = {
+export type RepoData = {
   repo: {
     id: number,
     name: string,

@@ -1,10 +1,10 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
 
-export type ToolbarProps = {
+export type RepoTrafficToolbarProps = {
 }
 
-const Toolbar: React.FC<ToolbarProps> = () => {
+const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = () => {
   return (
     <Box sx={{display: 'flex', justifyContent: 'space-between', mb: '1rem'}}>
       <Button variant="outlined" color="success" endIcon={<RefreshIcon />}>
@@ -27,4 +27,4 @@ const Toolbar: React.FC<ToolbarProps> = () => {
   )
 }
 
-export default Toolbar
+export default RepoTrafficToolbar
