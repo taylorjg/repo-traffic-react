@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { useState } from 'react'
-import { Alert, Snackbar, SnackbarCloseReason, SnackbarOrigin, Slide, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { Alert, LinearProgress, Snackbar, SnackbarOrigin, Slide, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { useQuery } from 'react-query'
+import Toolbar from './Toolbar'
 import RepoRow from './RepoRow'
 import { Item } from './types'
 
@@ -14,23 +15,11 @@ const ReposTable = () => {
   const [showError, setShowError] = useState(false)
   const [errorShown, setErrorShown] = useState(false)
 
-  const onCloseErrorCommon = () => {
+  const onCloseError = () => {
     setShowError(false)
   }
 
-  const onCloseError1 = (_event: React.SyntheticEvent<any, Event>, _reason: SnackbarCloseReason) => {
-    onCloseErrorCommon()
-  }
-
-  const onCloseError2 = (_event: React.SyntheticEvent<Element, Event>) => {
-    onCloseErrorCommon()
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
-  if (error && !showError && !errorShown) {
+  if (error && !errorShown) {
     setShowError(true)
     setErrorShown(true)
   }
@@ -49,6 +38,8 @@ const ReposTable = () => {
 
   return (
     <>
+      <Toolbar />
+      <LinearProgress sx={{ visibility: isLoading ? 'visible' : 'hidden', mb: '1rem' }} />
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -70,11 +61,11 @@ const ReposTable = () => {
       <Snackbar
         open={showError}
         autoHideDuration={5000}
-        onClose={onCloseError1}
+        onClose={onCloseError}
         anchorOrigin={anchorOrigin}
         TransitionComponent={Slide}
       >
-        <Alert onClose={onCloseError2} severity="error" variant="filled" sx={{ width: '100%' }}>
+        <Alert onClose={onCloseError} severity="error" variant="filled" sx={{ width: '100%' }}>
           {error?.message}
         </Alert>
       </Snackbar>

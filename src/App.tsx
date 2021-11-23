@@ -19,7 +19,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <CssBaseline />
-      <Container>
+      <Container className="app">
         <ReposTable />
         <Version />
       </Container>
