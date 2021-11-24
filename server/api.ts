@@ -97,32 +97,36 @@ export const configureApi = (username: string, token: string, repoLimit: number)
       }
     }
     const asyncIter = repoLimit > 0 ? getPageGen(url, config) : getPagesGen(url, config)
-    const CHUNK_SIZE = 100
+    const CHUNK_SIZE = 25
     const results: any[] = []
     for await (const reposChunk of asyncSplitEvery(asyncIter, CHUNK_SIZE)) {
-      console.log('[getRepos]', 'reposChunk.length:', reposChunk.length)
-      const viewsPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
-      const clonesPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
-      const responses = await Promise.all([...viewsPromises, ...clonesPromises])
-      const viewsResponses = responses.slice(0, reposChunk.length)
-      const clonesResponses = responses.slice(reposChunk.length)
-      reposChunk.forEach((repo: any, index: number) => {
-        results.push({
-          id: repo.id,
-          name: repo.name,
-          description: repo.description,
-          created_at: repo.created_at,
-          updated_at: repo.updated_at,
-          html_url: repo.html_url,
-          language: repo.language,
-          starsCount: repo.stargazers_count,
-          forksCount: repo.forks_count,
-          viewsCount: viewsResponses[index].data.count,
-          viewsUniques: viewsResponses[index].data.uniques,
-          clonesCount: clonesResponses[index].data.count,
-          clonesUniques: clonesResponses[index].data.uniques
+      try {
+        console.log('[getRepos]', 'reposChunk.length:', reposChunk.length)
+        const viewsPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
+        const clonesPromises = reposChunk.map(repo => axios.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
+        const responses = await Promise.all([...viewsPromises, ...clonesPromises])
+        const viewsResponses = responses.slice(0, reposChunk.length)
+        const clonesResponses = responses.slice(reposChunk.length)
+        reposChunk.forEach((repo: any, index: number) => {
+          results.push({
+            id: repo.id,
+            name: repo.name,
+            description: repo.description,
+            created_at: repo.created_at,
+            updated_at: repo.updated_at,
+            html_url: repo.html_url,
+            language: repo.language,
+            starsCount: repo.stargazers_count,
+            forksCount: repo.forks_count,
+            viewsCount: viewsResponses[index].data.count,
+            viewsUniques: viewsResponses[index].data.uniques,
+            clonesCount: clonesResponses[index].data.count,
+            clonesUniques: clonesResponses[index].data.uniques
+          })
         })
-      })
+      } catch (error) {
+        console.log(getErrorMessage(error as Error))
+      }
     }
     res.send(results)
   }
