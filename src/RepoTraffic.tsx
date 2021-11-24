@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, LinearProgress, Snackbar, SnackbarOrigin, Slide } from '@mui/material'
 import { useQuery } from 'react-query'
 import RepoTrafficToolbar from './RepoTrafficToolbar'
@@ -9,7 +9,6 @@ import { RepoData } from './types'
 const RepoTraffic = () => {
 
   const [showError, setShowError] = useState(false)
-  const [errorShown, setErrorShown] = useState(false)
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(0)
 
   const queryResult = useQuery<RepoData[], Error>(
@@ -21,13 +20,12 @@ const RepoTraffic = () => {
 
   const { isFetching, error, data: rows = [] } = queryResult
 
+  useEffect(() => {
+    setShowError(Boolean(queryResult.error))
+  }, [queryResult.error])
+
   const onCloseError = () => {
     setShowError(false)
-  }
-
-  if (error && !errorShown) {
-    setShowError(true)
-    setErrorShown(true)
   }
 
   const anchorOrigin: SnackbarOrigin = {
