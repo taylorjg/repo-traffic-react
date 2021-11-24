@@ -1,15 +1,16 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { Alert, LinearProgress, Snackbar, SnackbarOrigin, Slide } from '@mui/material'
+import { LinearProgress } from '@mui/material'
 import { useQuery } from 'react-query'
 import RepoTrafficToolbar from './RepoTrafficToolbar'
 import RepoTrafficTable from './RepoTrafficTable'
 import { RepoData } from './types'
+import { useToast } from './Toast'
 
 const RepoTraffic = () => {
 
-  const [showError, setShowError] = useState(false)
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(0)
+  const { renderToast, showError } = useToast()
 
   const queryResult = useQuery<RepoData[], Error>(
     'getRepos',
@@ -18,20 +19,18 @@ const RepoTraffic = () => {
       refetchInterval: autoRefreshInterval * 60 * 1000
     })
 
-  const { isFetching, error, data: rows = [] } = queryResult
+  const { isFetching, data: rows = [] } = queryResult
 
-  useEffect(() => {
-    setShowError(Boolean(queryResult.error))
-  }, [queryResult.error])
-
-  const onCloseError = () => {
-    setShowError(false)
-  }
-
-  const anchorOrigin: SnackbarOrigin = {
-    horizontal: 'center',
-    vertical: 'bottom'
-  }
+  useEffect(
+    () => {
+      if (queryResult.error) {
+        showError(queryResult.error.message)
+      }
+    },
+    // 'showError' is a stable function returned by 'useToast'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queryResult.error]
+  )
 
   const onRefresh = () => {
     console.log('[onRefresh]')
@@ -55,17 +54,7 @@ const RepoTraffic = () => {
       <LinearProgress sx={{ visibility: isFetching ? 'visible' : 'hidden', mb: '1rem' }} />
       <RepoTrafficTable rows={rows} />
 
-      <Snackbar
-        open={showError}
-        autoHideDuration={5000}
-        onClose={onCloseError}
-        anchorOrigin={anchorOrigin}
-        TransitionComponent={Slide}
-      >
-        <Alert onClose={onCloseError} severity="error" variant="filled" sx={{ width: '100%' }}>
-          {error?.message}
-        </Alert>
-      </Snackbar>
+      {renderToast()}
     </>
   )
 }
