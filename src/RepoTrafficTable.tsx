@@ -24,10 +24,11 @@ type HeadCell = {
 
 const headCells: HeadCell[] = [
   { property: 'name', label: 'Name', initialSortDirection: 'asc' },
-  { property: 'viewsCount', label: 'Views Count', initialSortDirection: 'desc' },
-  { property: 'viewsUniques', label: 'Views Uniques', initialSortDirection: 'desc' },
-  { property: 'clonesCount', label: 'Clones Count', initialSortDirection: 'desc' },
-  { property: 'clonesUniques', label: 'Clones Uniques', initialSortDirection: 'desc' },
+  { property: 'language', label: 'Language', initialSortDirection: 'asc' },
+  { property: 'viewsCount', label: 'Total Views', initialSortDirection: 'desc' },
+  { property: 'viewsUniques', label: 'Unique Views', initialSortDirection: 'desc' },
+  { property: 'clonesCount', label: 'Total Clones', initialSortDirection: 'desc' },
+  { property: 'clonesUniques', label: 'Unique Clones', initialSortDirection: 'desc' },
   { property: 'forksCount', label: 'Forks', initialSortDirection: 'desc' },
   { property: 'starsCount', label: 'Stars', initialSortDirection: 'desc' }
 ]

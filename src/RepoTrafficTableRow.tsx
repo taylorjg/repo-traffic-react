@@ -8,7 +8,8 @@ export type RepoTrafficTableRowProps = {
 const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
   return (
     <TableRow>
-      <TableCell>{repoData.name}</TableCell>
+      <TableCell><a href={repoData.htmlUrl}>{repoData.name}</a></TableCell>
+      <TableCell>{repoData.language}</TableCell>
       <TableCell>{repoData.viewsCount}</TableCell>
       <TableCell>{repoData.viewsUniques}</TableCell>
       <TableCell>{repoData.clonesCount}</TableCell>
