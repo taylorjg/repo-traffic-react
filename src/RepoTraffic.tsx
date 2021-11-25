@@ -48,6 +48,7 @@ const RepoTraffic = () => {
     <>
       <RepoTrafficToolbar
         autoRefreshInterval={autoRefreshInterval}
+        dataUpdatedAt={queryResult.dataUpdatedAt}
         onRefresh={onRefresh}
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />

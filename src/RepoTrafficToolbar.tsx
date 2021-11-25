@@ -3,12 +3,14 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 
 export type RepoTrafficToolbarProps = {
   autoRefreshInterval: number,
+  dataUpdatedAt?: number,
   onRefresh: () => void,
   onChangeAutoRefreshInterval: (autoRefreshInterval: number) => void
 }
 
 const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
   autoRefreshInterval,
+  dataUpdatedAt,
   onRefresh,
   onChangeAutoRefreshInterval
 }) => {
@@ -23,10 +25,11 @@ const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
   }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: '1rem' }}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '1rem' }}>
       <Button variant="outlined" color="success" endIcon={<RefreshIcon />} onClick={handleClickRefresh}>
         Refresh
       </Button>
+      {dataUpdatedAt !== undefined && dataUpdatedAt > 0 && <span>{new Date(dataUpdatedAt).toLocaleString()}</span>}
       <FormControl size="small" sx={{ minWidth: '10rem', ml: '2rem' }}>
         <InputLabel id="auto-refresh-interval-label">Auto Refresh</InputLabel>
         <Select
