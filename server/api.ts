@@ -75,22 +75,30 @@ async function* getPageGen(url: string, config: AxiosRequestConfig): AsyncGenera
   }
 }
 
-const displayRateLimitData = async () => {
+const displayRateLimitData = async (when: string) => {
   const { data } = await axios.get('/rate_limit')
-  console.log(`rate limit: ${data.resources.core.limit}`)
-  console.log(`rate remaining: ${data.resources.core.remaining}`)
-  console.log(`rate reset: ${new Date(data.resources.core.reset * 1000)}`)
+  const core = data.resources.core
+  const { limit, used, remaining } = core
+  const reset = new Date(core.reset * 1000).toLocaleString()
+  console.log(`[displayRateLimitData (${when})] limit: ${limit}; used: ${used}; remaining: ${remaining}; reset: ${reset}`)
+  return data
 }
 
-export const configureApi = (username: string, token: string, repoLimit: number) => {
+const getUserData = async () => {
+  const { data } = await axios.get('https://api.github.com/user')
+  return data
+}
+
+export const configureApi = (token: string, repoLimit: number) => {
 
   axios.defaults.baseURL = 'https://api.github.com'
   axios.defaults.headers.common['Accept'] = 'application/vnd.github.v3+json'
   axios.defaults.headers.common['Authorization'] = `token ${token}`
 
   const getRepos = async (_req: express.Request, res: express.Response) => {
-    displayRateLimitData()
-    const url = `/users/${username}/repos`
+    await displayRateLimitData('before')
+    const userData = await getUserData()
+    const url = userData.repos_url
     const config = {
       params: {
         per_page: repoLimit > 0 ? repoLimit : 100
@@ -128,6 +136,7 @@ export const configureApi = (username: string, token: string, repoLimit: number)
         console.log(getErrorMessage(error as Error))
       }
     }
+    await displayRateLimitData('after')
     res.send(results)
   }
 

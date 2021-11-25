@@ -6,18 +6,18 @@ import { configureApi } from './api'
 
 const BUILD_FOLDER = path.resolve(__dirname, '..', 'build')
 
-const username = process.env.GITHUB_USERNAME
 const token = process.env.GITHUB_TOKEN
 const clientId = process.env.GITHUB_CLIENT_ID
 const clientSecret = process.env.GITHUB_CLIENT_SECRET
-const repoLimit = Number(process.env.REPO_LIMIT)
+const repoLimitString = process.env.REPO_LIMIT
+const repoLimitNumber = Number(repoLimitString)
 
-if (!username || !token) {
-  process.stderr.write('GITHUB_USERNAME and GITHUB_TOKEN must be defined!\n')
+if (!token) {
+  process.stderr.write('GITHUB_TOKEN must be defined!\n')
   process.exit(1)
 }
 
-const apiRouter = configureApi(username, token, Number.isInteger(repoLimit) ? repoLimit : 0)
+const apiRouter = configureApi(token, Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0)
 
 const app = express()
 app.use(express.static(BUILD_FOLDER))
