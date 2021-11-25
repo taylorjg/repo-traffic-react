@@ -9,8 +9,12 @@ export type RepoTrafficTableProps = {
 
 type SortDirection = 'asc' | 'desc'
 
-const oppositeSortDirection = (sortDirection: SortDirection): SortDirection =>
-  sortDirection === 'asc' ? 'desc' : 'asc'
+const oppositeSortDirection = (sortDirection: SortDirection): SortDirection => {
+  switch (sortDirection) {
+    case 'asc': return 'desc'
+    case 'desc': return 'asc'
+  }
+}
 
 type HeadCell = {
   id: keyof RepoData,
@@ -39,7 +43,7 @@ const descendingComparator = <T,>(a: T, b: T, sortBy: keyof T) => {
   return 0
 }
 
-const getComparator = <Key extends keyof any>(sortDirection: SortDirection, sortBy: Key):
+const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sortBy: Key):
   (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number => {
   return sortDirection === 'desc'
     ? (a, b) => descendingComparator(a, b, sortBy)
