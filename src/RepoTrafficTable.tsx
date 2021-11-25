@@ -17,18 +17,19 @@ const oppositeSortDirection = (sortDirection: SortDirection): SortDirection => {
 }
 
 type HeadCell = {
-  id: keyof RepoData,
+  property: keyof RepoData,
   label: string,
+  initialSortDirection: SortDirection
 }
 
 const headCells: HeadCell[] = [
-  { id: 'name', label: 'Name' },
-  { id: 'viewsCount', label: 'Views Count' },
-  { id: 'viewsUniques', label: 'Views Uniques' },
-  { id: 'clonesCount', label: 'Clones Count' },
-  { id: 'clonesUniques', label: 'Clones Uniques' },
-  { id: 'forksCount', label: 'Forks' },
-  { id: 'starsCount', label: 'Stars' }
+  { property: 'name', label: 'Name', initialSortDirection: 'asc' },
+  { property: 'viewsCount', label: 'Views Count', initialSortDirection: 'desc' },
+  { property: 'viewsUniques', label: 'Views Uniques', initialSortDirection: 'desc' },
+  { property: 'clonesCount', label: 'Clones Count', initialSortDirection: 'desc' },
+  { property: 'clonesUniques', label: 'Clones Uniques', initialSortDirection: 'desc' },
+  { property: 'forksCount', label: 'Forks', initialSortDirection: 'desc' },
+  { property: 'starsCount', label: 'Stars', initialSortDirection: 'desc' }
 ]
 
 // Trailing comma after the type parameter is required so that the compiler
@@ -56,13 +57,13 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
   const createSortHandler =
-    (property: keyof RepoData) => (_event: React.MouseEvent<unknown>) => {
-      if (property === sortBy) {
+    (headCell: HeadCell) => (_event: React.MouseEvent<unknown>) => {
+      if (headCell.property === sortBy) {
         setSortDirection(oppositeSortDirection(sortDirection))
       } else {
-        setSortDirection('asc')
+        setSortDirection(headCell.initialSortDirection)
       }
-      setSortBy(property)
+      setSortBy(headCell.property)
     }
 
   const filterRows = (rows: RepoData[]): RepoData[] => {
@@ -84,11 +85,11 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
         <TableHead>
           <TableRow>
             {headCells.map(headCell => (
-              <TableCell key={headCell.id}>
+              <TableCell key={headCell.property}>
                 <TableSortLabel
-                  active={sortBy === headCell.id}
+                  active={sortBy === headCell.property}
                   direction={sortDirection}
-                  onClick={createSortHandler(headCell.id)}
+                  onClick={createSortHandler(headCell)}
                 >
                   {headCell.label}
                 </TableSortLabel>
