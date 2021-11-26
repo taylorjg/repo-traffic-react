@@ -27,7 +27,7 @@ const RepoTraffic = () => {
         showError(queryResult.error.message)
       }
     },
-    // 'showError' is a stable function returned by 'useToast'
+    // 'showError' is effectively stable because it only calls setState functions which are themselves stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [queryResult.error]
   )

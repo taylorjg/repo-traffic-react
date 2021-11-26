@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Alert, Snackbar, SnackbarOrigin, Slide, AlertColor } from '@mui/material'
 
 export const useToast = () => {
@@ -7,28 +7,16 @@ export const useToast = () => {
   const [message, setMessage] = useState('')
   const [severity, setSeverity] = useState<AlertColor>('success')
 
-  const stableFunctionsRef = useRef({
-    showSuccess: (message: string) => {
-      setOpen(true)
-      setMessage(message)
-      setSeverity('success')
-    },
-    showInfo: (message: string) => {
-      setOpen(true)
-      setMessage(message)
-      setSeverity('info')
-    },
-    showWarning: (message: string) => {
-      setOpen(true)
-      setMessage(message)
-      setSeverity('warning')
-    },
-    showError: (message: string) => {
-      setOpen(true)
-      setMessage(message)
-      setSeverity('error')
-    }
-  })
+  const showCommon = (message: string, severity: AlertColor) => {
+    setOpen(true)
+    setMessage(message)
+    setSeverity(severity)
+  }
+
+  const showSuccess = (message: string) => showCommon(message, 'success')
+  const showInfo = (message: string) => showCommon(message, 'info')
+  const showWarning = (message: string) => showCommon(message, 'warning')
+  const showError = (message: string) => showCommon(message, 'error')
 
   const handleClose = () => {
     setOpen(false)
@@ -58,6 +46,9 @@ export const useToast = () => {
 
   return {
     renderToast,
-    ...stableFunctionsRef.current
+    showSuccess,
+    showInfo,
+    showWarning,
+    showError
   }
 }
