@@ -26,9 +26,9 @@ const headCells: HeadCell[] = [
   { property: 'name', label: 'Name', initialSortDirection: 'asc' },
   { property: 'language', label: 'Language', initialSortDirection: 'asc' },
   { property: 'viewsCount', label: 'Total Views', initialSortDirection: 'desc' },
-  { property: 'viewsUniques', label: 'Unique Views', initialSortDirection: 'desc' },
+  { property: 'viewsUniques', label: 'Unique Viewers', initialSortDirection: 'desc' },
   { property: 'clonesCount', label: 'Total Clones', initialSortDirection: 'desc' },
-  { property: 'clonesUniques', label: 'Unique Clones', initialSortDirection: 'desc' },
+  { property: 'clonesUniques', label: 'Unique Cloners', initialSortDirection: 'desc' },
   { property: 'forksCount', label: 'Forks', initialSortDirection: 'desc' },
   { property: 'starsCount', label: 'Stars', initialSortDirection: 'desc' }
 ]

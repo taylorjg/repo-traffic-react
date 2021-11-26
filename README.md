@@ -15,6 +15,7 @@ This little app lists GitHub repos along with some traffic details.
 * JavaScript
 * Node.js
 * Express
+* Async/await, generators and async generators
 * GitHub REST API
 
 ## Things in this project that are new to me
