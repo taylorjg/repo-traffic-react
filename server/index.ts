@@ -2,7 +2,7 @@ import 'dotenv/config'
 import axios from 'axios'
 import express from 'express'
 import path from 'path'
-import { configureApi } from './api'
+import { configureApiRouter } from './apiRouter'
 
 const BUILD_FOLDER = path.resolve(__dirname, '..', 'build')
 
@@ -17,7 +17,7 @@ if (!token) {
   process.exit(1)
 }
 
-const apiRouter = configureApi(token, Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0)
+const apiRouter = configureApiRouter(token, Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0)
 
 const app = express()
 app.use(express.static(BUILD_FOLDER))
