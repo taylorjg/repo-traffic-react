@@ -17,6 +17,7 @@ This little app lists GitHub repos along with some traffic details.
 * Express
 * Async/await, generators and async generators
 * GitHub REST API
+* Deployment to Heroku
 
 ## Things in this project that are new to me
 
@@ -25,6 +26,7 @@ This little app lists GitHub repos along with some traffic details.
 * react-query
 * MUI
 * GitHub OAuth Apps (TODO)
+* CI/CD workflow using GitHub Actions (TODO)
 
 # TODO
 
@@ -35,6 +37,7 @@ This little app lists GitHub repos along with some traffic details.
 # Links
 
 * [GitHub REST API](https://docs.github.com/en/rest)
+* [GitHub Actions](https://github.com/features/actions)
 * [Building OAuth Apps](https://docs.github.com/en/developers/apps/building-oauth-apps)
 * [MUI: The React component library you always wanted](https://mui.com/)
 * [React Query - Hooks for fetching, caching and updating asynchronous data in React](https://react-query.tanstack.com/)
