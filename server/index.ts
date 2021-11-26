@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import axios from 'axios'
+import history from 'connect-history-api-fallback'
 import express from 'express'
 import path from 'path'
 import { configureApiRouter } from './apiRouter'
@@ -20,6 +21,7 @@ if (!token) {
 const apiRouter = configureApiRouter(token, Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0)
 
 const app = express()
+app.use(history())
 app.use(express.static(BUILD_FOLDER))
 app.use('/api', apiRouter)
 

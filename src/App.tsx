@@ -1,7 +1,8 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Container, CssBaseline } from '@mui/material'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import RepoTraffic from './RepoTraffic'
-import Version from './Version'
+import Authorize from './Authorize'
+import Home from './Home'
 import './App.css'
 
 const queryClient = new QueryClient({
@@ -20,8 +21,12 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <CssBaseline />
       <Container className="app">
-        <RepoTraffic />
-        <Version />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/authorize" element={<Authorize />} />
+            <Route path="/" element={<Home />} />
+          </Routes>
+        </BrowserRouter>
       </Container>
     </QueryClientProvider>
   )
