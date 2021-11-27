@@ -20,12 +20,7 @@ if (!token) {
 
 const apiRouter = configureApiRouter(token, Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0)
 
-const app = express()
-app.use(history())
-app.use(express.static(BUILD_FOLDER))
-app.use('/api', apiRouter)
-
-app.get('/oauth-callback', (req, res) => {
+const oauthCallback = (req: express.Request, res: express.Response) => {
   console.log('GET /oauth-callback', req.query)
   const body = {
     client_id: clientId,
@@ -45,10 +40,16 @@ app.get('/oauth-callback', (req, res) => {
     .then(token => {
       console.log('My token:', token)
       res.cookie('github-token', token, { maxAge: 1000 * 60 * 60 * 24 * 365 })
-      res.json({ ok: 1 })
+      res.redirect('/')
     })
     .catch(err => res.status(500).json({ message: err.message }))
-})
+}
+
+const app = express()
+app.get('/oauth-callback', oauthCallback)
+app.use(history())
+app.use(express.static(BUILD_FOLDER))
+app.use('/api', apiRouter)
 
 const port = process.env.PORT || 5000
 app.listen(port, () => console.log(`Listening on port ${port}`))

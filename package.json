@@ -39,7 +39,7 @@
     "build:server": "tsc -p server",
     "start:server": "ts-node server",
     "test:server": "jest server-tests --config server-tests/jest.config.js",
-    "clean:server": "rm -rf server/**/*.js",
+    "clean:server": "find server -name '*.js' -delete",
     "heroku-postbuild": "npm run build && npm run build:server"
   },
   "eslintConfig": {
