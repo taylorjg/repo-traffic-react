@@ -88,7 +88,35 @@ export const getUserData = async (axiosInstance: AxiosInstance) => {
   return data
 }
 
-export const getReposImpl = async (token: string, repoLimit: number) => {
+export const checkToken = async (clientId: string, clientSecret: string, token: string) => {
+  try {
+    // https://docs.github.com/rest/reference/apps#check-a-token
+    const url = `https://api.github.com/applications/${clientId}/token`
+    const data = { access_token: token }
+    const config = {
+      auth: {
+        username: clientId,
+        password: clientSecret
+      },
+      headers:
+      {
+        'Accept': 'application/vnd.github.v3+json',
+      }
+    }
+    const response = await axios.post(url, data, config)
+    console.log('[checkToken]', 'data:', response.data)
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      const error = e as Error
+      console.log('[checkToken]', 'ERROR:', error.message)
+    } else {
+      console.log('[checkToken]', 'ERROR:', e)
+    }
+  }
+}
+
+export const getReposImpl = async (clientId: string, clientSecret: string, token: string, repoLimit: number) => {
+  checkToken(clientId, clientSecret, token)
   const axiosInstance = axios.create({
     baseURL: 'https://api.github.com',
     headers: {

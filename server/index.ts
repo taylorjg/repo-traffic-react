@@ -29,7 +29,7 @@ if (!clientSecret) {
   process.exit(1)
 }
 
-const apiRouter = configureApiRouter(token, repoLimit)
+const apiRouter = configureApiRouter(clientId, clientSecret, token, repoLimit)
 const oauthRouter = configureOAuthRouter(clientId, clientSecret)
 
 const app = express()
