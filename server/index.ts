@@ -1,9 +1,9 @@
 import 'dotenv/config'
-import axios from 'axios'
 import history from 'connect-history-api-fallback'
 import express from 'express'
 import path from 'path'
 import { configureApiRouter } from './apiRouter'
+import { configureOAuthRouter } from './oauthRouter'
 
 const BUILD_FOLDER = path.resolve(__dirname, '..', 'build')
 
@@ -12,41 +12,28 @@ const clientId = process.env.GITHUB_CLIENT_ID
 const clientSecret = process.env.GITHUB_CLIENT_SECRET
 const repoLimitString = process.env.REPO_LIMIT
 const repoLimitNumber = Number(repoLimitString)
+const repoLimit = Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0
 
 if (!token) {
   process.stderr.write('GITHUB_TOKEN must be defined!\n')
   process.exit(1)
 }
 
-const apiRouter = configureApiRouter(token, Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0)
-
-const oauthCallback = (req: express.Request, res: express.Response) => {
-  console.log('GET /oauth-callback', req.query)
-  const body = {
-    client_id: clientId,
-    client_secret: clientSecret,
-    code: req.query.code
-  }
-  const opts = {
-    headers: {
-      accept: 'application/json'
-    }
-  }
-  axios.post(`https://github.com/login/oauth/access_token`, body, opts)
-    .then(res => {
-      console.log('[POST https://github.com/login/oauth/access_token response]', 'res.data:', res.data)
-      return res.data.access_token
-    })
-    .then(token => {
-      console.log('My token:', token)
-      res.cookie('github-token', token, { maxAge: 1000 * 60 * 60 * 24 * 365 })
-      res.redirect('/')
-    })
-    .catch(err => res.status(500).json({ message: err.message }))
+if (!clientId) {
+  process.stderr.write('GITHUB_CLIENT_ID must be defined!\n')
+  process.exit(1)
 }
 
+if (!clientSecret) {
+  process.stderr.write('GITHUB_CLIENT_SECRET must be defined!\n')
+  process.exit(1)
+}
+
+const apiRouter = configureApiRouter(token, repoLimit)
+const oauthRouter = configureOAuthRouter(clientId, clientSecret)
+
 const app = express()
-app.get('/oauth-callback', oauthCallback)
+app.use(oauthRouter)
 app.use(history())
 app.use(express.static(BUILD_FOLDER))
 app.use('/api', apiRouter)

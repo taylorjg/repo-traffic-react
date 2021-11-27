@@ -134,8 +134,14 @@ export const getReposImpl = async (token: string, repoLimit: number) => {
           clonesUniques: clonesResponses[index].data.uniques
         })
       })
-    } catch (error) {
-      console.log(getErrorMessage(error as Error))
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        const error = e as Error
+        console.log('[getReposImpl]', 'ERROR:', getErrorMessage(error))
+      } else {
+        console.log('[getReposImpl]', 'ERROR:', e)
+      }
+      break
     }
   }
   await displayRateLimitData(axiosInstance, 'after')

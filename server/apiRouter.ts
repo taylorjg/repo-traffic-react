@@ -4,7 +4,7 @@ import { getReposImpl } from './apiImpl'
 export const configureApiRouter = (token: string, repoLimit: number) => {
 
   const getRepos = async (_req: express.Request, res: express.Response) => {
-    console.log('[getRepos]', 'token:', token, 'repoLimit:', repoLimit)
+    console.log('[GET /api/repos]', 'token:', token, 'repoLimit:', repoLimit)
     const results = await getReposImpl(token, repoLimit)
     res.send(results)
   }
