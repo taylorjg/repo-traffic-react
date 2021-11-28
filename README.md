@@ -9,7 +9,11 @@ This little app lists GitHub repos along with some traffic details.
 > The next step is to turn it into a GitHub OAuth App so that anybody can authorize
 > it to display _their_ GitHub repos.
 
-## Things in this project that I already have experience with
+# Authorization steps
+
+![Authorization steps](screenshots/collage.jpg)
+
+# Things in this project that I already have experience with
 
 * React and Hooks
 * JavaScript
@@ -19,7 +23,7 @@ This little app lists GitHub repos along with some traffic details.
 * GitHub REST API
 * Deployment to Heroku
 
-## Things in this project that are new to me
+# Things in this project that are new to me
 
 * Node.js Express server with TypeScript
 * React with TypeScript
