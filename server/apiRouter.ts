@@ -10,8 +10,14 @@ export const configureApiRouter = (clientId: string, clientSecret: string, repoL
     res.send(results)
   }
 
+  const getClientId = (_req: express.Request, res: express.Response) => {
+    console.log('[GET /api/clientId]', 'clientId:', clientId)
+    res.json({ clientId })
+  }
+
   const apiRouter = express.Router()
   apiRouter.get('/repos', getRepos)
+  apiRouter.get('/clientId', getClientId)
 
   return apiRouter
 }

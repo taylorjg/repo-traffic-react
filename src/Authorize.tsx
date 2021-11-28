@@ -1,4 +1,8 @@
+import axios from 'axios'
+import { useState } from 'react'
+import { useQuery } from 'react-query'
 import { Button, Container } from '@mui/material'
+import { useToast } from './Toast'
 
 const codeStyle: React.CSSProperties = {
   padding: '.2em .4em',
@@ -9,10 +13,20 @@ const codeStyle: React.CSSProperties = {
   borderRadius: '6px'
 }
 
-const clientId = process.env.REACT_APP_CLIENT_ID
-
 const Authorize = () => {
+  const [clientId, setClientId] = useState('<CLIENT_ID>')
+  const { renderToast, showError } = useToast()
+
+  useQuery<{ clientId: string }, Error>(
+    'getClientId',
+    () => axios.get('/api/clientId').then(({ data }) => data),
+    {
+      onSuccess: data => setClientId(data.clientId),
+      onError: _ => showError('Failed to fetch clientId')
+    })
+
   const href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=repo`
+
   return (
     <Container maxWidth="sm">
       <p>
@@ -22,6 +36,7 @@ const Authorize = () => {
       </p>
 
       <Button href={href} variant="contained">Authorize</Button>
+      {renderToast()}
     </Container>
   )
 }
