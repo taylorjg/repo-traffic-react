@@ -1,5 +1,6 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { LinearProgress } from '@mui/material'
 import { useQuery } from 'react-query'
 import RepoTrafficToolbar from './RepoTrafficToolbar'
@@ -11,12 +12,21 @@ const RepoTraffic = () => {
 
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(0)
   const { renderToast, showError } = useToast()
+  const navigate = useNavigate()
 
   const queryResult = useQuery<RepoData[], Error>(
     'getRepos',
     () => axios.get('/api/repos').then(({ data }) => data),
     {
-      refetchInterval: autoRefreshInterval * 60 * 1000
+      refetchInterval: autoRefreshInterval * 60 * 1000,
+      onError: error => {
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError
+          if (axiosError.response?.status === 401) {
+            navigate('/authorize')
+          }
+        }
+      }
     })
 
   const { isFetching, data: rows = [] } = queryResult

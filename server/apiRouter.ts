@@ -6,8 +6,17 @@ export const configureApiRouter = (clientId: string, clientSecret: string, repoL
   const getRepos = async (req: express.Request, res: express.Response) => {
     const token = req.cookies['github-token'] as string
     console.log('[GET /api/repos]', 'clientId:', clientId, 'token:', token, 'repoLimit:', repoLimit)
-    const results = await getReposImpl(clientId, clientSecret, token, repoLimit)
-    res.send(results)
+    const outcome = await getReposImpl(clientId, clientSecret, token, repoLimit)
+    // TODO: introduce a type to model outcome
+    if (outcome.success) {
+      res.send(outcome.success)
+    } else {
+      if (outcome.badToken) {
+        res.status(401).end()
+      } else {
+        res.status(500).end()
+      }
+    }
   }
 
   const getClientId = (_req: express.Request, res: express.Response) => {

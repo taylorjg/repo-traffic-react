@@ -35,7 +35,7 @@ export const authenticateMiddleware = (clientId: string, clientSecret: string) =
 
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.log('[authenticateMiddleware]', 'req.url:', req.url, 'req.originalUrl:', req.originalUrl)
-    if (req.url === '/index.html' && req.originalUrl !== '/authorize') {
+    if (['/', '/index.html'].includes(req.originalUrl)) {
       const token = req.cookies['github-token']
       console.log('[authenticateMiddleware]', '"github-token" cookie:', token)
       const ok = await checkToken(clientId, clientSecret, token)

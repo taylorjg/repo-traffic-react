@@ -83,14 +83,10 @@ const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) 
   return data
 }
 
-// export const getUserData = async (axiosInstance: AxiosInstance) => {
-//   const { data } = await axiosInstance.get('https://api.github.com/user')
-//   return data
-// }
-
+// https://docs.github.com/rest/reference/apps#check-a-token
 export const checkToken = async (clientId: string, clientSecret: string, token: string) => {
   try {
-    // https://docs.github.com/rest/reference/apps#check-a-token
+    if (!token) return undefined
     const url = `https://api.github.com/applications/${clientId}/token`
     const data = { access_token: token }
     const config = {
@@ -104,7 +100,6 @@ export const checkToken = async (clientId: string, clientSecret: string, token: 
       }
     }
     const response = await axios.post(url, data, config)
-    // console.log('[checkToken]', 'response.data:', response.data)
     return response.data
   } catch (e: unknown) {
     if (e instanceof Error) {
@@ -113,39 +108,47 @@ export const checkToken = async (clientId: string, clientSecret: string, token: 
     } else {
       console.log('[checkToken]', 'ERROR:', e)
     }
+    return undefined
   }
 }
 
 export const getReposImpl = async (clientId: string, clientSecret: string, token: string, repoLimit: number) => {
 
   const checkTokenData = await checkToken(clientId, clientSecret, token)
-  const { login, repos_url } = checkTokenData.user
-  console.log('[getReposImpl]', 'login:', login, 'repos_url', repos_url)
-
-  const axiosInstance = axios.create({
-    baseURL: 'https://api.github.com',
-    headers: {
-      'Accept': 'application/vnd.github.v3+json',
-      'Authorization': `token ${token}`
-    }
-  })
-
-  await displayRateLimitData(axiosInstance, 'before')
-
-  const config = {
-    params: {
-      per_page: repoLimit > 0 ? repoLimit : 100
-    }
+  if (!checkTokenData) {
+    return { badToken: true }
   }
-  const asyncIter = repoLimit > 0
-    ? getPageGen(axiosInstance, repos_url, config)
-    : getPagesGen(axiosInstance, repos_url, config)
+  const appName = checkTokenData.app.name
+  const appUrl = checkTokenData.app.url
+  const login = checkTokenData.user.login
+  const reposUrl = checkTokenData.user.repos_url
+  console.log('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl', reposUrl)
 
-  const CHUNK_SIZE = 25
-  const results: any[] = []
+  try {
 
-  for await (const reposChunk of asyncSplitEvery(asyncIter, CHUNK_SIZE)) {
-    try {
+    const axiosInstance = axios.create({
+      baseURL: 'https://api.github.com',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`
+      }
+    })
+
+    await displayRateLimitData(axiosInstance, 'before')
+
+    const config = {
+      params: {
+        per_page: repoLimit > 0 ? repoLimit : 100
+      }
+    }
+    const asyncIter = repoLimit > 0
+      ? getPageGen(axiosInstance, reposUrl, config)
+      : getPagesGen(axiosInstance, reposUrl, config)
+
+    const CHUNK_SIZE = 25
+    const results: any[] = []
+
+    for await (const reposChunk of asyncSplitEvery(asyncIter, CHUNK_SIZE)) {
       console.log('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
       const viewsPromises = reposChunk.map(repo => axiosInstance.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
       const clonesPromises = reposChunk.map(repo => axiosInstance.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
@@ -169,17 +172,16 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           clonesUniques: clonesResponses[index].data.uniques
         })
       })
-    } catch (e: unknown) {
-      console.dir(e)
-      if (e instanceof Error) {
-        const error = e as Error
-        console.log('[getReposImpl]', 'ERROR:', getErrorMessage(error))
-      } else {
-        console.log('[getReposImpl]', 'ERROR:', e)
-      }
-      break
     }
+    await displayRateLimitData(axiosInstance, 'after')
+    return { success: results }
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      const error = e as Error
+      console.log('[getReposImpl]', 'ERROR:', getErrorMessage(error))
+    } else {
+      console.log('[getReposImpl]', 'ERROR:', e)
+    }
+    return { error: true }
   }
-  await displayRateLimitData(axiosInstance, 'after')
-  return results
 }
