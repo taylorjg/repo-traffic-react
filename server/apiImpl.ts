@@ -83,10 +83,10 @@ const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) 
   return data
 }
 
-export const getUserData = async (axiosInstance: AxiosInstance) => {
-  const { data } = await axiosInstance.get('https://api.github.com/user')
-  return data
-}
+// export const getUserData = async (axiosInstance: AxiosInstance) => {
+//   const { data } = await axiosInstance.get('https://api.github.com/user')
+//   return data
+// }
 
 export const checkToken = async (clientId: string, clientSecret: string, token: string) => {
   try {
@@ -104,11 +104,12 @@ export const checkToken = async (clientId: string, clientSecret: string, token: 
       }
     }
     const response = await axios.post(url, data, config)
-    console.log('[checkToken]', 'data:', response.data)
+    // console.log('[checkToken]', 'response.data:', response.data)
+    return response.data
   } catch (e: unknown) {
     if (e instanceof Error) {
       const error = e as Error
-      console.log('[checkToken]', 'ERROR:', error.message)
+      console.log('[checkToken]', 'ERROR:', getErrorMessage(error))
     } else {
       console.log('[checkToken]', 'ERROR:', e)
     }
@@ -116,7 +117,11 @@ export const checkToken = async (clientId: string, clientSecret: string, token: 
 }
 
 export const getReposImpl = async (clientId: string, clientSecret: string, token: string, repoLimit: number) => {
-  checkToken(clientId, clientSecret, token)
+
+  const checkTokenData = await checkToken(clientId, clientSecret, token)
+  const { login, repos_url } = checkTokenData.user
+  console.log('[getReposImpl]', 'login:', login, 'repos_url', repos_url)
+
   const axiosInstance = axios.create({
     baseURL: 'https://api.github.com',
     headers: {
@@ -124,19 +129,21 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       'Authorization': `token ${token}`
     }
   })
+
   await displayRateLimitData(axiosInstance, 'before')
-  const userData = await getUserData(axiosInstance)
-  const url = userData.repos_url
+
   const config = {
     params: {
       per_page: repoLimit > 0 ? repoLimit : 100
     }
   }
   const asyncIter = repoLimit > 0
-    ? getPageGen(axiosInstance, url, config)
-    : getPagesGen(axiosInstance, url, config)
+    ? getPageGen(axiosInstance, repos_url, config)
+    : getPagesGen(axiosInstance, repos_url, config)
+
   const CHUNK_SIZE = 25
   const results: any[] = []
+
   for await (const reposChunk of asyncSplitEvery(asyncIter, CHUNK_SIZE)) {
     try {
       console.log('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
@@ -163,6 +170,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
         })
       })
     } catch (e: unknown) {
+      console.dir(e)
       if (e instanceof Error) {
         const error = e as Error
         console.log('[getReposImpl]', 'ERROR:', getErrorMessage(error))
