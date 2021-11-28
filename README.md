@@ -1,13 +1,13 @@
 # Description
 
 I have used `React` for a few years and I have some familiarity with `TypeScript`
-but this is my first attempt at using them together.
+but this is my first attempt at using them together. The backend Express server
+also uses `TypeScript`.
 
-This little app lists GitHub repos along with some traffic details.
-
-> Currently, this app only displays _my_ GitHub repos.
-> The next step is to turn it into a GitHub OAuth App so that anybody can authorize
-> it to display _their_ GitHub repos.
+This little app lists your GitHub repos along with some traffic details.
+It is a GitHub OAuth App - you need to authorize it to allow access to your GitHub repos.
+Once authorized, it maintains the GitHub access token in an
+encrypted cookie (`github-token`).
 
 # Authorization steps
 
@@ -23,7 +23,7 @@ This little app lists GitHub repos along with some traffic details.
 * GitHub REST API
 * Deployment to Heroku
 
-# Things in this project that are new to me
+# Things in this project that were new to me
 
 * Node.js Express server with TypeScript
 * React with TypeScript
@@ -35,9 +35,10 @@ This little app lists GitHub repos along with some traffic details.
 # TODO
 
 * ~~Turn this into a GitHub OAuth App~~
-* Add screenshots showing the authorization process
+* ~~Add screenshots showing the authorization process~~
 * Show totals (views, clones, stars, forks)
 * Show user details
+* Add CI/CD workflow using GitHub Actions
 * Responsive UI
 * Tests
 
