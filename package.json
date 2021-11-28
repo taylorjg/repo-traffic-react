@@ -22,6 +22,7 @@
     "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^10.0.0",
+    "encrypt-cookie": "^1.1.5",
     "express": "^4.17.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

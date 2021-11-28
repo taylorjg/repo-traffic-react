@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import history from 'connect-history-api-fallback'
 import cookieParser from 'cookie-parser'
+import { encryptCookieNodeMiddleware } from 'encrypt-cookie'
 import express from 'express'
 import path from 'path'
 import { configureApiRouter } from './apiRouter'
@@ -11,9 +12,7 @@ const BUILD_FOLDER = path.resolve(__dirname, '..', 'build')
 
 const clientId = process.env.GITHUB_CLIENT_ID
 const clientSecret = process.env.GITHUB_CLIENT_SECRET
-const repoLimitString = process.env.REPO_LIMIT
-const repoLimitNumber = Number(repoLimitString)
-const repoLimit = Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0
+const encryptCookiePassword = process.env.ENCRYPT_COOKIE_PASSWORD
 
 if (!clientId) {
   process.stderr.write('GITHUB_CLIENT_ID must be defined!\n')
@@ -25,11 +24,21 @@ if (!clientSecret) {
   process.exit(1)
 }
 
+if (!encryptCookiePassword) {
+  process.stderr.write('ENCRYPT_COOKIE_PASSWORD must be defined!\n')
+  process.exit(1)
+}
+
+const repoLimitString = process.env.REPO_LIMIT
+const repoLimitNumber = Number(repoLimitString)
+const repoLimit = Number.isInteger(repoLimitNumber) ? repoLimitNumber : 0
+
 const apiRouter = configureApiRouter(clientId, clientSecret, repoLimit)
 const oauthRouter = configureOAuthRouter(clientId, clientSecret)
 
 const app = express()
 app.use(cookieParser())
+app.use(encryptCookieNodeMiddleware(encryptCookiePassword))
 app.use(oauthRouter)
 app.use('/api', apiRouter)
 app.use(history())
