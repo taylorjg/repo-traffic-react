@@ -25,12 +25,15 @@ This little app lists GitHub repos along with some traffic details.
 * React with TypeScript
 * react-query
 * MUI
-* GitHub OAuth Apps (TODO)
+* GitHub OAuth Apps
 * CI/CD workflow using GitHub Actions (TODO)
 
 # TODO
 
-* Turn this into a GitHub OAuth App
+* ~~Turn this into a GitHub OAuth App~~
+* Add screenshots showing the authorization process
+* Show totals (views, clones, stars, forks)
+* Show user details
 * Responsive UI
 * Tests
 
