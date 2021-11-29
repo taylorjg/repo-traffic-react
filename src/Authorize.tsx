@@ -25,7 +25,7 @@ const Authorize = () => {
       onError: _ => showError('Failed to fetch clientId')
     })
 
-  const href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=repo`
+  const href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=public_repo`
 
   return (
     <Container maxWidth="sm">

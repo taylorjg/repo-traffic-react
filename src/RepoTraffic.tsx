@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { LinearProgress } from '@mui/material'
 import { useQuery } from 'react-query'
 import RepoTrafficToolbar from './RepoTrafficToolbar'
+import RepoTrafficTotals from './RepoTrafficTotals'
 import RepoTrafficTable from './RepoTrafficTable'
 import { RepoData } from './types'
 import { useToast } from './Toast'
@@ -61,6 +62,7 @@ const RepoTraffic = () => {
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />
       <LinearProgress sx={{ visibility: isFetching ? 'visible' : 'hidden', mb: '1rem' }} />
+      <RepoTrafficTotals rows={rows} />
       <RepoTrafficTable rows={rows} />
 
       {renderToast()}
