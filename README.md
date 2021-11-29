@@ -45,8 +45,8 @@ encrypted cookie (`github-token`).
 # Links
 
 * [GitHub REST API](https://docs.github.com/en/rest)
-* [GitHub Actions](https://github.com/features/actions)
 * [Building OAuth Apps](https://docs.github.com/en/developers/apps/building-oauth-apps)
 * [OAuth Applications API](https://docs.github.com/en/rest/reference/apps#oauth-applications-api)
+* [GitHub Actions](https://github.com/features/actions)
 * [MUI: The React component library you always wanted](https://mui.com/)
 * [React Query - Hooks for fetching, caching and updating asynchronous data in React](https://react-query.tanstack.com/)

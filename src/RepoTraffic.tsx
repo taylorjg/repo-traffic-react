@@ -43,14 +43,12 @@ const RepoTraffic = () => {
   )
 
   const onRefresh = () => {
-    console.log('[onRefresh]')
     if (!queryResult.isFetching) {
       queryResult.refetch()
     }
   }
 
   const onChangeAutoRefreshInterval = (autoRefreshInterval: number) => {
-    console.log('[onChangeAutoRefreshInterval]', 'autoRefreshInterval:', autoRefreshInterval)
     setAutoRefreshInterval(autoRefreshInterval)
   }
 

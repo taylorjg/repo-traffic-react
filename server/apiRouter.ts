@@ -1,11 +1,14 @@
 import express from 'express'
+import log from 'loglevel'
 import { getReposImpl } from './apiImpl'
+import * as C from './constants'
 
 export const configureApiRouter = (clientId: string, clientSecret: string, repoLimit: number) => {
 
   const getRepos = async (req: express.Request, res: express.Response) => {
-    const token = req.cookies['github-token'] as string
-    console.log('[GET /api/repos]', 'clientId:', clientId, 'token:', token, 'repoLimit:', repoLimit)
+    const token = req.cookies[C.TOKEN_COOKIE_NAME] as string
+    log.info('[GET /api/repos]', 'clientId:', clientId, 'repoLimit:', repoLimit)
+    log.debug('[GET /api/repos]', 'token:', token)
     const outcome = await getReposImpl(clientId, clientSecret, token, repoLimit)
     // TODO: introduce a type to model outcome
     if (outcome.success) {
@@ -20,7 +23,7 @@ export const configureApiRouter = (clientId: string, clientSecret: string, repoL
   }
 
   const getClientId = (_req: express.Request, res: express.Response) => {
-    console.log('[GET /api/clientId]', 'clientId:', clientId)
+    log.info('[GET /api/clientId]', 'clientId:', clientId)
     res.json({ clientId })
   }
 

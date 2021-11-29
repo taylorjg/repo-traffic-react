@@ -1,35 +1,42 @@
-import express from 'express'
 import axios from 'axios'
+import express from 'express'
+import log from 'loglevel'
+import * as C from './constants'
+
+const ONE_YEAR_AS_MILLISECONDS = 1000 * 60 * 60 * 24 * 365
 
 export const configureOAuthRouter = (clientId: string, clientSecret: string) => {
 
   const oauthCallback = async (req: express.Request, res: express.Response) => {
     try {
-      console.log('[GET /oauth-callback]', 'req.query:', req.query)
+      log.info('[GET /oauth-callback]', 'req.query:', req.query)
 
-      const body = {
+      const url = 'https://github.com/login/oauth/access_token'
+
+      const data = {
         client_id: clientId,
         client_secret: clientSecret,
         code: req.query.code
       }
 
-      const opts = {
+      const config = {
         headers: {
           accept: 'application/json'
         }
       }
 
-      const { data } = await axios.post(`https://github.com/login/oauth/access_token`, body, opts)
-      console.log('[POST https://github.com/login/oauth/access_token response]', 'data:', data)
-      const token = data.access_token
-      res.cookie('github-token', token, { maxAge: 1000 * 60 * 60 * 24 * 365 })
-      res.redirect('/')
+      const response = await axios.post(url, data, config)
+      log.info('[GET /oauth-callback]', `received response from POST ${url}`)
+      log.debug('[GET /oauth-callback]', 'received:', response.data)
+      const token = response.data.access_token
+      res.cookie(C.TOKEN_COOKIE_NAME, token, { maxAge: ONE_YEAR_AS_MILLISECONDS })
+      res.redirect(C.HOME_VIEW)
     } catch (e: unknown) {
       if (e instanceof Error) {
         const error = e as Error
-        console.log('[GET /oauth-callback]', 'ERROR:', error.message)
+        log.error('[GET /oauth-callback]', 'ERROR:', error.message)
       } else {
-        console.log('[GET /oauth-callback]', 'ERROR:', e)
+        log.error('[GET /oauth-callback]', 'ERROR:', e)
       }
     }
   }

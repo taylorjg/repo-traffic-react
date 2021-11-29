@@ -1,20 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosInstance } from 'axios'
+import log from 'loglevel'
+import { checkToken } from './checkToken'
+import { getErrorMessage } from './errorUtils'
 
-const getErrorMessage = (error: Error) => {
-  const response = (error as any).response as AxiosResponse
-  if (response) {
-    const status = response.status
-    const statusText = response.statusText
-    if (response.data && response.data.message) {
-      return `status: ${status}; statusText: ${statusText}; message: ${response.data.message}`
-    }
-    else {
-      return `status: ${status}; statusText: ${statusText}; message: ${error.message}`
-    }
-  } else {
-    return `message: ${error.message}`
-  }
-}
+const MAX_REPOS_PER_PAGE = 100
+const MAX_PARALLEL_TRAFFIC_CALLS = 25
 
 export const parseLinkHeader = (linkHeader: string) => {
   if (!linkHeader) {
@@ -46,31 +36,43 @@ export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): Asy
   }
 }
 
-async function* getPagesGen(axiosInstance: AxiosInstance, url: string, config: AxiosRequestConfig): AsyncGenerator<any> {
-  console.log('[getPagesGen]', 'url:', url)
+async function* getItemsGen(
+  axiosInstance: AxiosInstance,
+  url: string,
+  maxPerPage: number,
+  limit: number | undefined
+): AsyncGenerator<any> {
+  log.info('[getItemsGen]', 'url:', url)
+  const perPage = (
+    limit !== undefined &&
+    Number.isInteger(limit) &&
+    limit > 0 &&
+    limit < maxPerPage
+  )
+    ? limit
+    : maxPerPage
   try {
+    const config = {
+      params: {
+        per_page: perPage
+      }
+    }
     const response = await axiosInstance.get(url, config)
-    const repos = response.data
-    yield* repos
+    const items = response.data
+    yield* items
+
+    if (perPage < maxPerPage) {
+      return
+    }
+
     const linkHeader = response.headers['link']
     const links = parseLinkHeader(linkHeader)
     const nextLink = links.find(({ rel }) => rel === 'next')
     if (nextLink) {
-      yield* getPagesGen(axiosInstance, nextLink.href, config)
+      yield* getItemsGen(axiosInstance, nextLink.href, maxPerPage, limit)
     }
-  } catch (error) {
-    console.log(getErrorMessage(error as Error))
-  }
-}
-
-async function* getPageGen(axiosInstance: AxiosInstance, url: string, config: AxiosRequestConfig): AsyncGenerator<any> {
-  console.log('[getPageGen]', 'url:', url)
-  try {
-    const response = await axiosInstance.get(url, config)
-    const repos = response.data
-    yield* repos
-  } catch (error) {
-    console.log(getErrorMessage(error as Error))
+  } catch (e: unknown) {
+    log.error('[getItemsGen]', getErrorMessage(e))
   }
 }
 
@@ -79,37 +81,8 @@ const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) 
   const core = data.resources.core
   const { limit, used, remaining } = core
   const reset = new Date(core.reset * 1000).toLocaleString()
-  console.log(`[displayRateLimitData (${when})] limit: ${limit}; used: ${used}; remaining: ${remaining}; reset: ${reset}`)
+  log.info(`[displayRateLimitData (${when})] limit: ${limit}; used: ${used}; remaining: ${remaining}; reset: ${reset}`)
   return data
-}
-
-// https://docs.github.com/rest/reference/apps#check-a-token
-export const checkToken = async (clientId: string, clientSecret: string, token: string) => {
-  try {
-    if (!token) return undefined
-    const url = `https://api.github.com/applications/${clientId}/token`
-    const data = { access_token: token }
-    const config = {
-      auth: {
-        username: clientId,
-        password: clientSecret
-      },
-      headers:
-      {
-        'Accept': 'application/vnd.github.v3+json',
-      }
-    }
-    const response = await axios.post(url, data, config)
-    return response.data
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      const error = e as Error
-      console.log('[checkToken]', 'ERROR:', getErrorMessage(error))
-    } else {
-      console.log('[checkToken]', 'ERROR:', e)
-    }
-    return undefined
-  }
 }
 
 export const getReposImpl = async (clientId: string, clientSecret: string, token: string, repoLimit: number) => {
@@ -122,7 +95,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
   const appUrl = checkTokenData.app.url
   const login = checkTokenData.user.login
   const reposUrl = checkTokenData.user.repos_url
-  console.log('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl', reposUrl)
+  log.info('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl', reposUrl)
 
   try {
 
@@ -136,20 +109,12 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
 
     await displayRateLimitData(axiosInstance, 'before')
 
-    const config = {
-      params: {
-        per_page: repoLimit > 0 ? repoLimit : 100
-      }
-    }
-    const asyncIter = repoLimit > 0
-      ? getPageGen(axiosInstance, reposUrl, config)
-      : getPagesGen(axiosInstance, reposUrl, config)
+    const asyncReposIter = getItemsGen(axiosInstance, reposUrl, MAX_REPOS_PER_PAGE, repoLimit)
 
-    const CHUNK_SIZE = 25
     const results: any[] = []
 
-    for await (const reposChunk of asyncSplitEvery(asyncIter, CHUNK_SIZE)) {
-      console.log('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
+    for await (const reposChunk of asyncSplitEvery(asyncReposIter, MAX_PARALLEL_TRAFFIC_CALLS)) {
+      log.info('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
       const viewsPromises = reposChunk.map(repo => axiosInstance.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
       const clonesPromises = reposChunk.map(repo => axiosInstance.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
       const responses = await Promise.all([...viewsPromises, ...clonesPromises])
@@ -176,12 +141,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
     await displayRateLimitData(axiosInstance, 'after')
     return { success: results }
   } catch (e: unknown) {
-    if (e instanceof Error) {
-      const error = e as Error
-      console.log('[getReposImpl]', 'ERROR:', getErrorMessage(error))
-    } else {
-      console.log('[getReposImpl]', 'ERROR:', e)
-    }
+    log.error('[getReposImpl]', getErrorMessage(e))
     return { error: true }
   }
 }
