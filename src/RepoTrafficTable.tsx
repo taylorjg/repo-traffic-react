@@ -55,7 +55,7 @@ const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sor
 const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
 
   const [sortBy, setSortBy] = useState<keyof RepoData>('viewsCount')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   const createSortHandler =
     (headCell: HeadCell) => (_event: React.MouseEvent<unknown>) => {
