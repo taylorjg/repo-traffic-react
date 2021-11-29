@@ -25,10 +25,10 @@ type HeadCell = {
 const headCells: HeadCell[] = [
   { property: 'name', label: 'Name', initialSortDirection: 'asc' },
   { property: 'language', label: 'Language', initialSortDirection: 'asc' },
-  { property: 'viewsCount', label: 'Total Views', initialSortDirection: 'desc' },
-  { property: 'viewsUniques', label: 'Unique Viewers', initialSortDirection: 'desc' },
-  { property: 'clonesCount', label: 'Total Clones', initialSortDirection: 'desc' },
-  { property: 'clonesUniques', label: 'Unique Cloners', initialSortDirection: 'desc' },
+  { property: 'viewsCount', label: 'Views', initialSortDirection: 'desc' },
+  { property: 'viewsUniques', label: 'Viewers', initialSortDirection: 'desc' },
+  { property: 'clonesCount', label: 'Clones', initialSortDirection: 'desc' },
+  { property: 'clonesUniques', label: 'Cloners', initialSortDirection: 'desc' },
   { property: 'forksCount', label: 'Forks', initialSortDirection: 'desc' },
   { property: 'starsCount', label: 'Stars', initialSortDirection: 'desc' }
 ]
@@ -54,7 +54,7 @@ const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sor
 
 const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
 
-  const [sortBy, setSortBy] = useState<keyof RepoData>('name')
+  const [sortBy, setSortBy] = useState<keyof RepoData>('viewsCount')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
   const createSortHandler =
