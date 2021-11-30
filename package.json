@@ -42,7 +42,7 @@
     "eject": "react-scripts eject",
     "build:server": "tsc -p server",
     "start:server": "ts-node server",
-    "test:server": "jest server-tests --config server-tests/jest.config.js",
+    "test:server": "npm run build:server && jest server-tests --config server-tests/jest.config.js",
     "clean:server": "find server -name '*.js' -delete",
     "heroku-postbuild": "npm run build && npm run build:server"
   },

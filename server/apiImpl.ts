@@ -6,6 +6,7 @@ import { getErrorMessage } from './errorUtils'
 const MAX_REPOS_PER_PAGE = 100
 const MAX_PARALLEL_TRAFFIC_CALLS = 25
 
+// https://docs.github.com/en/rest/overview/resources-in-the-rest-api#pagination
 export const parseLinkHeader = (linkHeader: string) => {
   if (!linkHeader) {
     return []
@@ -36,11 +37,11 @@ export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): Asy
   }
 }
 
-async function* getItemsGen(
+export async function* getItemsGen(
   axiosInstance: AxiosInstance,
   url: string,
   maxPerPage: number,
-  limit: number | undefined
+  limit?: number
 ): AsyncGenerator<any> {
   log.info('[getItemsGen]', 'url:', url)
   const perPage = (
@@ -51,28 +52,24 @@ async function* getItemsGen(
   )
     ? limit
     : maxPerPage
-  try {
-    const config = {
-      params: {
-        per_page: perPage
-      }
+  const config = {
+    params: {
+      per_page: perPage
     }
-    const response = await axiosInstance.get(url, config)
-    const items = response.data
-    yield* items
+  }
+  const response = await axiosInstance.get(url, config)
+  const items = response.data
+  yield* items
 
-    if (perPage < maxPerPage) {
-      return
-    }
+  if (perPage < maxPerPage) {
+    return
+  }
 
-    const linkHeader = response.headers['link']
-    const links = parseLinkHeader(linkHeader)
-    const nextLink = links.find(({ rel }) => rel === 'next')
-    if (nextLink) {
-      yield* getItemsGen(axiosInstance, nextLink.href, maxPerPage, limit)
-    }
-  } catch (e: unknown) {
-    log.error('[getItemsGen]', getErrorMessage(e))
+  const linkHeader = response.headers['link']
+  const links = parseLinkHeader(linkHeader)
+  const nextLink = links.find(({ rel }) => rel === 'next')
+  if (nextLink) {
+    yield* getItemsGen(axiosInstance, nextLink.href, maxPerPage, limit)
   }
 }
 
