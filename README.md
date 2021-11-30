@@ -35,9 +35,14 @@ encrypted cookie (`github-token`).
 # TODO
 
 * ~~Turn this into a GitHub OAuth App~~
+* Add a link to review access
+  * See [Directing users to review their access](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#directing-users-to-review-their-access)
 * ~~Add screenshots showing the authorization process~~
 * Show totals (views, clones, stars, forks)
 * Show user details
+* Show stats (elapsed time, number of API calls, rate limit details)
+* Use conditional requests as these don't count against the rate limit
+  * See [Conditional requests](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#conditional-requests)
 * Add CI/CD workflow using GitHub Actions
 * Responsive UI
 * Tests
