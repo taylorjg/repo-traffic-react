@@ -11,6 +11,12 @@ encrypted cookie (`github-token`).
 
 # Authorization steps
 
+1) If you have not authorized yet, then I initially show a view explaining that you need to authorize
+and provide a button to start the process
+2) You are then redirected to GitHub where you can review the permissions required by this app - namely the `public_repo` scope
+3) You will need to login to your GitHub account to complete the process
+4) After successful authorization, you are redirected to the home view
+
 ![Authorization steps](screenshots/collage.jpg)
 
 # Things in this project that I already have experience with
@@ -25,8 +31,8 @@ encrypted cookie (`github-token`).
 
 # Things in this project that were new to me
 
-* Node.js Express server with TypeScript
-* React with TypeScript
+* Node.js Express server **with TypeScript**
+* React **with TypeScript**
 * react-query
 * MUI
 * GitHub OAuth Apps
@@ -35,17 +41,21 @@ encrypted cookie (`github-token`).
 # TODO
 
 * ~~Turn this into a GitHub OAuth App~~
+* ~~Add screenshots showing the authorization process~~
 * Add a link to review access
   * See [Directing users to review their access](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#directing-users-to-review-their-access)
-* ~~Add screenshots showing the authorization process~~
 * Show totals (views, clones, stars, forks)
 * Show user details
 * Show stats (elapsed time, number of API calls, rate limit details)
 * Use conditional requests as these don't count against the rate limit
   * See [Conditional requests](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#conditional-requests)
 * Add CI/CD workflow using GitHub Actions
+* Semantic markup
+* Accessibility (a11y)
 * Responsive UI
 * Tests
+  * ~~Backend~~
+  * Frontend
 
 # Links
 
