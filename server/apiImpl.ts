@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import log from 'loglevel'
 import { checkToken } from './checkToken'
+import { conditionalRequest } from './conditionalRequest'
 import { getErrorMessage } from './errorUtils'
 
 const MAX_REPOS_PER_PAGE = 100
@@ -92,7 +93,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
   const appUrl = checkTokenData.app.url
   const login = checkTokenData.user.login
   const reposUrl = checkTokenData.user.repos_url
-  log.info('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl', reposUrl)
+  log.info('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl:', reposUrl)
 
   try {
 
@@ -112,11 +113,11 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
 
     for await (const reposChunk of asyncSplitEvery(asyncReposIter, MAX_PARALLEL_TRAFFIC_CALLS)) {
       log.info('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
-      const viewsPromises = reposChunk.map(repo => axiosInstance.get(`/repos/${repo.owner.login}/${repo.name}/traffic/views`))
-      const clonesPromises = reposChunk.map(repo => axiosInstance.get(`/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
+      const viewsPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${repo.owner.login}/${repo.name}/traffic/views`))
+      const clonesPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
       const responses = await Promise.all([...viewsPromises, ...clonesPromises])
-      const viewsResponses = responses.slice(0, reposChunk.length)
-      const clonesResponses = responses.slice(reposChunk.length)
+      const viewsResults = responses.slice(0, reposChunk.length)
+      const clonesResults = responses.slice(reposChunk.length)
       reposChunk.forEach((repo: any, index: number) => {
         results.push({
           id: repo.id,
@@ -128,10 +129,10 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           language: repo.language,
           starsCount: repo.stargazers_count,
           forksCount: repo.forks_count,
-          viewsCount: viewsResponses[index].data.count,
-          viewsUniques: viewsResponses[index].data.uniques,
-          clonesCount: clonesResponses[index].data.count,
-          clonesUniques: clonesResponses[index].data.uniques
+          viewsCount: viewsResults[index].data.count,
+          viewsUniques: viewsResults[index].data.uniques,
+          clonesCount: clonesResults[index].data.count,
+          clonesUniques: clonesResults[index].data.uniques
         })
       })
     }

@@ -44,11 +44,11 @@ and provide a button to start the process
 * ~~Add screenshots showing the authorization process~~
 * Add a link to review access
   * See [Directing users to review their access](https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#directing-users-to-review-their-access)
-* Show totals (views, clones, stars, forks)
+* ~~Show totals (views, clones, stars, forks)~~
 * Show user details
 * Show stats (elapsed time, number of API calls, rate limit details)
-* Use conditional requests as these don't count against the rate limit
-  * See [Conditional requests](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#conditional-requests)
+* ~~Use conditional requests as these don't count against the rate limit when the resource is unchanged i.e. when status code 304 is returned~~
+  * ~~See [Conditional requests](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#conditional-requests)~~
 * Add CI/CD workflow using GitHub Actions
 * Semantic markup
 * Accessibility (a11y)
