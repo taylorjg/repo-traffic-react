@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LinearProgress } from '@mui/material'
 import { useQuery } from 'react-query'
@@ -22,26 +22,16 @@ const RepoTraffic = () => {
       refetchInterval: autoRefreshInterval * 60 * 1000,
       onError: error => {
         if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError
-          if (axiosError.response?.status === 401) {
+          if (error.response?.status === 401) {
             navigate('/authorize')
+            return
           }
         }
+        showError(error.message)
       }
     })
 
   const { isFetching, data: rows = [] } = queryResult
-
-  useEffect(
-    () => {
-      if (queryResult.error) {
-        showError(queryResult.error.message)
-      }
-    },
-    // 'showError' is effectively stable because it only calls setState functions which are themselves stable.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [queryResult.error]
-  )
 
   const onRefresh = () => {
     if (!queryResult.isFetching) {
@@ -59,6 +49,7 @@ const RepoTraffic = () => {
         autoRefreshInterval={autoRefreshInterval}
         dataUpdatedAt={queryResult.dataUpdatedAt}
         onRefresh={onRefresh}
+        isFetching={isFetching}
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />
       <LinearProgress sx={{ visibility: isFetching ? 'visible' : 'hidden', mb: '1rem' }} />

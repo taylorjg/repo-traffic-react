@@ -5,6 +5,7 @@ export type RepoTrafficToolbarProps = {
   autoRefreshInterval: number,
   dataUpdatedAt?: number,
   onRefresh: () => void,
+  isFetching: boolean,
   onChangeAutoRefreshInterval: (autoRefreshInterval: number) => void
 }
 
@@ -12,6 +13,7 @@ const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
   autoRefreshInterval,
   dataUpdatedAt,
   onRefresh,
+  isFetching,
   onChangeAutoRefreshInterval
 }) => {
 
@@ -26,7 +28,13 @@ const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '1rem' }}>
-      <Button variant="outlined" color="success" endIcon={<RefreshIcon />} onClick={handleClickRefresh}>
+      <Button
+        variant="outlined"
+        color="success"
+        endIcon={<RefreshIcon />}
+        onClick={handleClickRefresh}
+        disabled={isFetching}
+      >
         Refresh
       </Button>
       {dataUpdatedAt !== undefined && dataUpdatedAt > 0 && <span>{new Date(dataUpdatedAt).toLocaleString()}</span>}
@@ -38,6 +46,7 @@ const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
           value={autoRefreshInterval}
           label="Auto Refresh"
           onChange={handleChangeAutoRefreshInterval}
+          disabled={isFetching}
         >
           <MenuItem value={0}>Off</MenuItem>
           <MenuItem value={15}>15 Minutes</MenuItem>
