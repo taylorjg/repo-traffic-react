@@ -4,17 +4,18 @@ jobs:
   run-unit-tests-job:
     runs-on: ubuntu-latest
     steps:
-      - name: run-unit-tests-steps
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: npm clean-install
+      - name: "Run client unit tests"
+        run: npm test
+      - name: "Run server unit tests"
+        run: npm run test:server
         env:
           GITHUB_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           GITHUB_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           ENCRYPT_COOKIE_PASSWORD: ${{ secrets.ENCRYPT_COOKIE_PASSWORD }}
           GITHUB_TOKEN_VALID: ${{ secrets.TOKEN_VALID }}
           GITHUB_TOKEN_REVOKED: ${{ secrets.TOKEN_REVOKED }}
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - run: npm clean-install
-      - run: npm test
-      - run: npm run test:server
