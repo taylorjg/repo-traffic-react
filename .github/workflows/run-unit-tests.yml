@@ -1,10 +1,11 @@
 name: run-unit-tests
 on: push
 jobs:
-  run-unit-tests:
+  run-unit-tests-job:
     runs-on: ubuntu-latest
     steps:
-      - env:
+      - name: run-unit-tests-steps
+        env:
           GITHUB_CLIENT_ID: ${{ secrets.CLIENT_ID }}
           GITHUB_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           ENCRYPT_COOKIE_PASSWORD: ${{ secrets.ENCRYPT_COOKIE_PASSWORD }}
