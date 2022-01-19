@@ -4,6 +4,12 @@ jobs:
   run-unit-tests:
     runs-on: ubuntu-latest
     steps:
+      - env:
+          GITHUB_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          ENCRYPT_COOKIE_PASSWORD: ${{ secrets.ENCRYPT_COOKIE_PASSWORD }}
+          GITHUB_TOKEN_VALID: ${{ secrets.TOKEN_VALID }}
+          GITHUB_TOKEN_REVOKED: ${{ secrets.TOKEN_REVOKED }}
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
