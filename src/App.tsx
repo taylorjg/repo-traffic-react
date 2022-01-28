@@ -1,9 +1,15 @@
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { Button, Container, CssBaseline } from '@mui/material'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { createTheme, Button, Container, CssBaseline, ThemeProvider } from '@mui/material'
+
 import Home from './Home'
 import Authorize from './Authorize'
-import './App.css'
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark'
+  }
+})
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,17 +37,19 @@ const NotFound = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <CssBaseline />
-      <Container className="app">
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/index.html" element={<Home />} />
-            <Route path="/authorize" element={<Authorize />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </Container>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <Container sx={{ mt: '2rem' }}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/index.html" element={<Home />} />
+              <Route path="/authorize" element={<Authorize />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </Container>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }
