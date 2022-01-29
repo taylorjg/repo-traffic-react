@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from '@mui/material'
+import { Link, TableCell, TableRow } from '@mui/material'
 import OpenInNew from '@mui/icons-material/OpenInNew'
 import { RepoData } from './types'
 import styled from '@emotion/styled'
@@ -12,24 +12,17 @@ const AlignedCenter = styled.div`
   align-items: center;
 `
 
-const StyledLink = styled.a`
-  color: blue;
-  &:visited {
-    color: blue;
-  }
-`
-
 const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
   return (
     <TableRow>
       <TableCell>
         <AlignedCenter>
           {repoData.name}
-          <StyledLink href={repoData.htmlUrl}>
+          <Link href={repoData.htmlUrl}>
             <AlignedCenter>
               <OpenInNew style={{ marginLeft: '.25rem', fontSize: 'small' }} />
             </AlignedCenter>
-          </StyledLink>
+          </Link>
         </AlignedCenter>
       </TableCell>
       <TableCell>{repoData.language}</TableCell>
