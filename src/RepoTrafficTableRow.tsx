@@ -13,14 +13,15 @@ const AlignedCenter = styled.div`
   align-items: center;
 `
 
-const lookupColor = (language: string) => {
+const languageToBorder = (language: string) => {
   const entry = (colors as any)[language]
-  if (entry) return entry.color
-  return "inherit"
+  return entry && entry.color
+    ? `2px solid ${entry.color}`
+    : "unset"
 }
 
 const StyledLanguage = styled.div<{ language: string }>`
-  border: ${props => `2px solid ${lookupColor(props.language)}`};
+  border: ${props => languageToBorder(props.language)};
   text-align: center;
 `
 
