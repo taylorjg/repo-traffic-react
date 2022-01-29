@@ -5,6 +5,7 @@ import { LinearProgress } from '@mui/material'
 import { useQuery } from 'react-query'
 import RepoTrafficToolbar from './RepoTrafficToolbar'
 import RepoTrafficTotals from './RepoTrafficTotals'
+import RepoTrafficFilter from './RepoTrafficFilter'
 import RepoTrafficTable from './RepoTrafficTable'
 import { RepoData } from './types'
 import { useToast } from './Toast'
@@ -12,6 +13,7 @@ import { useToast } from './Toast'
 const RepoTraffic = () => {
 
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(0)
+  const [filterString, setFilterString] = useState('')
   const { renderToast, showError } = useToast()
   const navigate = useNavigate()
 
@@ -43,6 +45,10 @@ const RepoTraffic = () => {
     setAutoRefreshInterval(autoRefreshInterval)
   }
 
+  const filteredRows = filterString
+    ? rows.filter(row => row.name.toLowerCase().includes(filterString))
+    : rows
+
   return (
     <>
       <RepoTrafficToolbar
@@ -53,9 +59,11 @@ const RepoTraffic = () => {
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />
       <LinearProgress sx={{ visibility: isFetching ? 'visible' : 'hidden', mb: '1rem' }} />
-      <RepoTrafficTotals rows={rows} />
-      <RepoTrafficTable rows={rows} />
-
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <RepoTrafficTotals rows={rows} />
+        <RepoTrafficFilter onChange={(value: string) => setFilterString(value.toLowerCase())} />
+      </div>
+      <RepoTrafficTable rows={filteredRows} />
       {renderToast()}
     </>
   )
