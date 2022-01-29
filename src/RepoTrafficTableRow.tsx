@@ -2,6 +2,7 @@ import { Link, TableCell, TableRow } from '@mui/material'
 import OpenInNew from '@mui/icons-material/OpenInNew'
 import { RepoData } from './types'
 import styled from '@emotion/styled'
+import colors from './colors.json'
 
 export type RepoTrafficTableRowProps = {
   repoData: RepoData
@@ -10,6 +11,17 @@ export type RepoTrafficTableRowProps = {
 const AlignedCenter = styled.div`
   display: flex;
   align-items: center;
+`
+
+const lookupColor = (language: string) => {
+  const entry = (colors as any)[language]
+  if (entry) return entry.color
+  return "inherit"
+}
+
+const StyledLanguage = styled.div<{ language: string }>`
+  border: ${props => `2px solid ${lookupColor(props.language)}`};
+  text-align: center;
 `
 
 const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
@@ -25,7 +37,11 @@ const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) =
           </Link>
         </AlignedCenter>
       </TableCell>
-      <TableCell>{repoData.language}</TableCell>
+      <TableCell>
+        <StyledLanguage language={repoData.language}>
+          {repoData.language}
+        </StyledLanguage>
+      </TableCell>
       <TableCell>{repoData.viewsCount}</TableCell>
       <TableCell>{repoData.viewsUniques}</TableCell>
       <TableCell>{repoData.clonesCount}</TableCell>
