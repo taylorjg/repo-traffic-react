@@ -21,6 +21,7 @@ jobs:
           GITHUB_TOKEN_REVOKED: ${{ secrets.TOKEN_REVOKED }}
   deploy-to-heroku:
     needs: run-unit-tests
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
