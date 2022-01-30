@@ -36,7 +36,7 @@ and provide a button to start the process
 * react-query
 * MUI
 * GitHub OAuth Apps
-* CI/CD workflow using GitHub Actions (TODO)
+* CI/CD workflow using GitHub Actions
 
 # TODO
 
@@ -49,7 +49,7 @@ and provide a button to start the process
 * Show stats (elapsed time, number of API calls, rate limit details)
 * ~~Use conditional requests as these don't count against the rate limit when the resource is unchanged i.e. when status code 304 is returned~~
   * ~~See [Conditional requests](https://docs.github.com/en/rest/overview/resources-in-the-rest-api#conditional-requests)~~
-* Add CI/CD workflow using GitHub Actions
+* ~~Add CI/CD workflow using GitHub Actions~~
 * Semantic markup
 * Accessibility (a11y)
 * Responsive UI
