@@ -26,16 +26,21 @@ describe('apiImpl integration tests', () => {
       })
 
       it('when limit is specified', async () => {
-        const asyncItemsIter = getItemsGen(axiosInstance, url, 100, 10)
+        const asyncItemsIter = getItemsGen(axiosInstance, url, {
+          pageSize: 100,
+          maxItems: 112
+        })
         const items = []
         for await (const item of asyncItemsIter) {
           items.push(item)
         }
-        expect(items).toHaveLength(10)
+        expect(items).toHaveLength(112)
       })
 
       it('when no limit is specified', async () => {
-        const asyncItemsIter = getItemsGen(axiosInstance, url, 100)
+        const asyncItemsIter = getItemsGen(axiosInstance, url, {
+          pageSize: 100
+        })
         const items = []
         for await (const item of asyncItemsIter) {
           items.push(item)
@@ -55,7 +60,10 @@ describe('apiImpl integration tests', () => {
       })
 
       it('throws when trying to access the first item', async () => {
-        const asyncItemsIter = getItemsGen(axiosInstance, url, 100, 10)
+        const asyncItemsIter = getItemsGen(axiosInstance, url, {
+          pageSize: 100,
+          maxItems: 10
+        })
         await expect(asyncItemsIter.next()).rejects.toThrow('Request failed with status code 401')
       })
     })

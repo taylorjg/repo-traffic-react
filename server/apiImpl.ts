@@ -40,38 +40,50 @@ export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): Asy
 
 export async function* getItemsGen(
   axiosInstance: AxiosInstance,
-  url: string,
-  maxPerPage: number,
-  limit?: number
+  initialUrl: string,
+  options: {
+    pageSize?: number,
+    maxItems?: number
+  } = {}
 ): AsyncGenerator<any> {
-  log.info('[getItemsGen]', 'url:', url)
-  const perPage = (
-    limit !== undefined &&
-    Number.isInteger(limit) &&
-    limit > 0 &&
-    limit < maxPerPage
-  )
-    ? limit
-    : maxPerPage
-  const config = {
-    params: {
-      per_page: perPage
+
+  async function* helper(url: string, itemCountSoFar: number): AsyncGenerator<any> {
+
+    log.info('[getItemsGen helper]', 'url:', url)
+
+    let maybePerPageParam = {}
+    if (options.pageSize) {
+      if (options.maxItems) {
+        const remainingItems = options.maxItems - itemCountSoFar
+        maybePerPageParam = { per_page: Math.min(options.pageSize, remainingItems) }
+      } else {
+        maybePerPageParam = { per_page: options.pageSize }
+      }
+    }
+
+    const config = {
+      params: {
+        ...maybePerPageParam
+      }
+    }
+
+    const response = await axiosInstance.get(url, config)
+    const items = response.data
+    yield* items
+
+    const linkHeader = response.headers['link']
+    const links = parseLinkHeader(linkHeader)
+    const nextLink = links.find(({ rel }) => rel === 'next')
+    if (nextLink) {
+      const newItemCountSoFar = itemCountSoFar + items.length
+      if (options.maxItems && newItemCountSoFar >= options.maxItems) {
+        return
+      }
+      yield* helper(nextLink.href, newItemCountSoFar)
     }
   }
-  const response = await axiosInstance.get(url, config)
-  const items = response.data
-  yield* items
 
-  if (perPage < maxPerPage) {
-    return
-  }
-
-  const linkHeader = response.headers['link']
-  const links = parseLinkHeader(linkHeader)
-  const nextLink = links.find(({ rel }) => rel === 'next')
-  if (nextLink) {
-    yield* getItemsGen(axiosInstance, nextLink.href, maxPerPage, limit)
-  }
+  yield* helper(initialUrl, 0)
 }
 
 const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) => {
@@ -107,7 +119,10 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
 
     await displayRateLimitData(axiosInstance, 'before')
 
-    const asyncReposIter = getItemsGen(axiosInstance, reposUrl, MAX_REPOS_PER_PAGE, repoLimit)
+    const asyncReposIter = getItemsGen(axiosInstance, reposUrl, {
+      pageSize: MAX_REPOS_PER_PAGE,
+      maxItems: repoLimit
+    })
 
     const results: any[] = []
 

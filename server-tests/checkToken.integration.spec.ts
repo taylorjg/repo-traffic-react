@@ -1,5 +1,8 @@
 import 'dotenv/config'
 import { checkToken } from '../server/checkToken'
+import log from 'loglevel'
+
+log.setLevel('silent')
 
 const {
   GITHUB_CLIENT_ID,
