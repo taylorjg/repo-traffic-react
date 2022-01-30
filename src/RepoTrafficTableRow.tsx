@@ -8,11 +8,6 @@ export type RepoTrafficTableRowProps = {
   repoData: RepoData
 }
 
-const AlignedCenter = styled.div`
-  display: flex;
-  align-items: center;
-`
-
 const languageToBorder = (language: string) => {
   const entry = (colors as any)[language]
   return entry && entry.color
@@ -25,18 +20,28 @@ const StyledLanguage = styled.div<{ language: string }>`
   text-align: center;
 `
 
+const AlignedIcon = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const StyledOpenInNew = styled(OpenInNew)`
+  margin-left: .25rem;
+  font-size: small;
+`
+
 const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
   return (
     <TableRow>
       <TableCell>
-        <AlignedCenter>
+        <AlignedIcon>
           {repoData.name}
           <Link href={repoData.htmlUrl}>
-            <AlignedCenter>
-              <OpenInNew style={{ marginLeft: '.25rem', fontSize: 'small' }} />
-            </AlignedCenter>
+            <AlignedIcon>
+              <StyledOpenInNew />
+            </AlignedIcon>
           </Link>
-        </AlignedCenter>
+        </AlignedIcon>
       </TableCell>
       <TableCell>
         <StyledLanguage language={repoData.language}>

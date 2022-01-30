@@ -21,22 +21,20 @@ const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ rows }) => {
   const totalStars = sumBy(rows, row => row.starsCount)
 
   return (
-    <div style={{ maxWidth: '15rem' }}>
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Totals</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <div>Total repos: {totalRepos}</div>
-          <div>Total views: {totalViews}</div>
-          <div>Total viewers: {totalViewers}</div>
-          <div>Total clones: {totalClones}</div>
-          <div>Total cloners: {totalCloners}</div>
-          <div>Total forks: {totalForks}</div>
-          <div>Total stars: {totalStars}</div>
-        </AccordionDetails>
-      </Accordion>
-    </div>
+    <Accordion>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography>Totals</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div>Total repos: {totalRepos}</div>
+        <div>Total views: {totalViews}</div>
+        <div>Total viewers: {totalViewers}</div>
+        <div>Total clones: {totalClones}</div>
+        <div>Total cloners: {totalCloners}</div>
+        <div>Total forks: {totalForks}</div>
+        <div>Total stars: {totalStars}</div>
+      </AccordionDetails>
+    </Accordion>
   )
 }
 
