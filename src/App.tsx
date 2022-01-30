@@ -29,7 +29,7 @@ const NotFound = () => {
       <p>
         Path not found: <code>"{location.pathname}"</code>.
       </p>
-      <Button href="/" variant="contained">Home</Button>
+      <Button href="/" variant="contained" size="small">Home</Button>
     </Container>
   )
 }

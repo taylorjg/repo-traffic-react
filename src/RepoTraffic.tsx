@@ -9,6 +9,18 @@ import RepoTrafficFilter from './RepoTrafficFilter'
 import RepoTrafficTable from './RepoTrafficTable'
 import { RepoData } from './types'
 import { useToast } from './Toast'
+import styled from '@emotion/styled'
+
+const NetworkActivityProgressBar = styled(LinearProgress) <{ isActive: boolean }>`
+  visibility: ${props => props.isActive ? 'visible' : 'hidden'};
+  margin-bottom: 1rem;
+`
+
+const StyledControlBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
 
 const RepoTraffic = () => {
 
@@ -58,11 +70,11 @@ const RepoTraffic = () => {
         isFetching={isFetching}
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />
-      <LinearProgress sx={{ visibility: isFetching ? 'visible' : 'hidden', mb: '1rem' }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <NetworkActivityProgressBar isActive={isFetching} />
+      <StyledControlBar>
         <RepoTrafficTotals rows={rows} />
         <RepoTrafficFilter onChange={(value: string) => setFilterString(value.toLowerCase())} />
-      </div>
+      </StyledControlBar>
       <RepoTrafficTable rows={filteredRows} />
       {renderToast()}
     </>

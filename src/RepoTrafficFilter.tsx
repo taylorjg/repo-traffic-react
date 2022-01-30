@@ -1,5 +1,11 @@
 import { TextField } from '@mui/material'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
+import styled from '@emotion/styled'
+
+const StyledFilter = styled.div`
+  display: flex;
+  align-items: center;
+`
 
 export type RepoTrafficFilterProps = {
   onChange: (value: string) => void
@@ -8,10 +14,10 @@ export type RepoTrafficFilterProps = {
 const RepoTrafficFilter: React.FC<RepoTrafficFilterProps> = ({ onChange }) => {
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <StyledFilter>
       <FilterAltIcon />
       <TextField size="small" onChange={(event: any) => onChange(event.target.value)} />
-    </div>
+    </StyledFilter>
   )
 }
 
