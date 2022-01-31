@@ -19,7 +19,7 @@ const NetworkActivityProgressBar = styled(LinearProgress) <{ isActive: boolean }
 const StyledControlBar = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: start;
 `
 
 const RepoTraffic = () => {
