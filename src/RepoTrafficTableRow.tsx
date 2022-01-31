@@ -1,4 +1,4 @@
-import { Link, TableCell, TableRow } from '@mui/material'
+import { Link, TableCell, TableRow, Tooltip } from '@mui/material'
 import OpenInNew from '@mui/icons-material/OpenInNew'
 import { RepoData } from './types'
 import styled from '@emotion/styled'
@@ -35,7 +35,9 @@ const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) =
     <TableRow>
       <TableCell>
         <AlignedIcon>
-          {repoData.name}
+          <Tooltip title={repoData.description} arrow>
+            <span>{repoData.name}</span>
+          </Tooltip>
           <Link href={repoData.htmlUrl}>
             <AlignedIcon>
               <StyledOpenInNew />
