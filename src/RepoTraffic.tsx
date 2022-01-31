@@ -11,7 +11,8 @@ import { RepoData } from './types'
 import { useToast } from './Toast'
 import styled from '@emotion/styled'
 
-const NetworkActivityProgressBar = styled(LinearProgress) <{ isActive: boolean }>`
+// https://github.com/reakit/reakit/issues/466#issuecomment-544344689
+const NetworkActivityProgressBar = styled(({ isActive, ...props }: { isActive: boolean }) => <LinearProgress {...props} />)`
   visibility: ${props => props.isActive ? 'visible' : 'hidden'};
   margin-bottom: 1rem;
 `
@@ -19,7 +20,7 @@ const NetworkActivityProgressBar = styled(LinearProgress) <{ isActive: boolean }
 const StyledControlBar = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: flex-start;
 `
 
 const RepoTraffic = () => {

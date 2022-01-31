@@ -30,12 +30,44 @@ const StyledOpenInNew = styled(OpenInNew)`
   font-size: small;
 `
 
+const StyledTooltipLabelCell = styled.td`
+  font-weight: bold;
+  vertical-align: top;
+`
+
+const StyledTooltipValueCell = styled.td`
+`
+
+type StyledTooltipRowProps = {
+  label: string
+  value: string
+}
+
+const StyledTooltipRow: React.FC<StyledTooltipRowProps> = ({ label, value }) => {
+  return (
+    <tr>
+      <StyledTooltipLabelCell>{label}</StyledTooltipLabelCell>
+      <StyledTooltipValueCell>{value}</StyledTooltipValueCell>
+    </tr>
+  )
+}
+
+const formatDateString = (dateString: string) => new Date(dateString).toLocaleDateString()
+
 const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
   return (
     <TableRow>
       <TableCell>
         <AlignedIcon>
-          <Tooltip title={repoData.description} arrow>
+          <Tooltip title={
+            <table>
+              <tbody>
+                <StyledTooltipRow label="Description:" value={repoData.description} />
+                <StyledTooltipRow label="Created At:" value={formatDateString(repoData.createdAt)} />
+                <StyledTooltipRow label="Updated At:" value={formatDateString(repoData.updatedAt)} />
+              </tbody>
+            </table>}
+            arrow>
             <span>{repoData.name}</span>
           </Tooltip>
           <Link href={repoData.htmlUrl}>
