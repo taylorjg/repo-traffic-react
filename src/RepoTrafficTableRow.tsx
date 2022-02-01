@@ -54,22 +54,35 @@ const StyledTooltipRow: React.FC<StyledTooltipRowProps> = ({ label, value }) => 
 
 const formatDateString = (dateString: string) => new Date(dateString).toLocaleDateString()
 
+type RepoTooltipProps = {
+  repoData: RepoData
+  children: React.ReactElement<any, any>
+}
+
+const RepoTooltip: React.FC<RepoTooltipProps> = ({ repoData, children }) => {
+  return (
+    <Tooltip title={
+      <table>
+        <tbody>
+          <StyledTooltipRow label="Description:" value={repoData.description} />
+          <StyledTooltipRow label="Created At:" value={formatDateString(repoData.createdAt)} />
+          <StyledTooltipRow label="Updated At:" value={formatDateString(repoData.updatedAt)} />
+        </tbody>
+      </table>}
+      arrow>
+        {children}
+    </Tooltip>
+  )
+}
+
 const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
   return (
     <TableRow>
       <TableCell>
         <AlignedIcon>
-          <Tooltip title={
-            <table>
-              <tbody>
-                <StyledTooltipRow label="Description:" value={repoData.description} />
-                <StyledTooltipRow label="Created At:" value={formatDateString(repoData.createdAt)} />
-                <StyledTooltipRow label="Updated At:" value={formatDateString(repoData.updatedAt)} />
-              </tbody>
-            </table>}
-            arrow>
+          <RepoTooltip repoData={repoData}>
             <span>{repoData.name}</span>
-          </Tooltip>
+          </RepoTooltip>
           <Link href={repoData.htmlUrl}>
             <AlignedIcon>
               <StyledOpenInNew />
