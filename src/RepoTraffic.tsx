@@ -74,7 +74,7 @@ const RepoTraffic = () => {
       <NetworkActivityProgressBar isActive={isFetching} />
       <StyledControlBar>
         <RepoTrafficTotals rows={rows} />
-        <RepoTrafficFilter onChange={(value: string) => setFilterString(value.toLowerCase())} />
+        <RepoTrafficFilter value={filterString} onChange={(value: string) => setFilterString(value.toLowerCase())} />
       </StyledControlBar>
       <RepoTrafficTable rows={filteredRows} />
       {renderToast()}
