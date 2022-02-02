@@ -18,11 +18,13 @@ const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
 }) => {
 
   const handleClickRefresh = () => {
+    gtag('event', 'refresh_data', {})
     onRefresh()
   }
 
   const handleChangeAutoRefreshInterval = (event: SelectChangeEvent<number>) => {
     const value = event.target.value as number
+    gtag('event', 'change_auto_refresh', { value })
     onChangeAutoRefreshInterval(value)
   }
 
