@@ -48,8 +48,12 @@ const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ rows }) => {
   const totalForks = sumBy(rows, row => row.forksCount)
   const totalStars = sumBy(rows, row => row.starsCount)
 
+  const onChange = (_event: React.SyntheticEvent, expanded: boolean) => {
+    gtag('event', expanded ? 'open_totals' : 'close_totals')
+  }
+
   return (
-    <Accordion>
+    <Accordion onChange={onChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>Totals</Typography>
       </AccordionSummary>

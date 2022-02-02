@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel } from '@mui/material'
 import RepoTrafficTableRow from './RepoTrafficTableRow'
 import { RepoData } from './types'
@@ -56,6 +56,13 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
 
   const [sortBy, setSortBy] = useState<keyof RepoData>('viewsCount')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+
+  useEffect(() => {
+    gtag('event', 'change_sort_order', {
+      sort_by: sortBy,
+      sort_direction: sortDirection
+    })
+  }, [sortBy, sortDirection])
 
   const createSortHandler =
     (headCell: HeadCell) => (_event: React.MouseEvent<unknown>) => {
