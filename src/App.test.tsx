@@ -3,6 +3,9 @@ import { setupServer } from 'msw/node'
 import { rest } from 'msw'
 import App from './App'
 
+// Mock Google Analytics
+window.gtag = jest.fn()
+
 const handlers = [
   rest.get('/api/repos', (_req, res, ctx) => {
     return res(
