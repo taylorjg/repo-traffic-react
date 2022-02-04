@@ -1,7 +1,7 @@
 {
   "name": "repo-traffic-react",
   "description": "Display GitHub repo traffic data using React and TypeScript",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.6.0",
