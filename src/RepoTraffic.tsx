@@ -6,6 +6,7 @@ import { useQuery } from 'react-query'
 import RepoTrafficToolbar from './RepoTrafficToolbar'
 import RepoTrafficTotals from './RepoTrafficTotals'
 import RepoTrafficFilter from './RepoTrafficFilter'
+import RepoTrafficMinValue from './RepoTrafficMinValue'
 import RepoTrafficTable from './RepoTrafficTable'
 import { RepoData } from './types'
 import { useToast } from './Toast'
@@ -26,6 +27,7 @@ const StyledControlBar = styled.div`
 const RepoTraffic = () => {
 
   const [autoRefreshInterval, setAutoRefreshInterval] = useState(0)
+  const [minValue, setMinValue] = useState(1)
   const [filterString, setFilterString] = useState('')
   const { renderToast, showError } = useToast()
   const navigate = useNavigate()
@@ -58,6 +60,10 @@ const RepoTraffic = () => {
     setAutoRefreshInterval(autoRefreshInterval)
   }
 
+  const onChangeMinValue = (minValue: number) => {
+    setMinValue(minValue)
+  }
+
   const filteredRows = filterString
     ? rows.filter(row => row.name.toLowerCase().includes(filterString))
     : rows
@@ -74,9 +80,10 @@ const RepoTraffic = () => {
       <NetworkActivityProgressBar isActive={isFetching} />
       <StyledControlBar>
         <RepoTrafficTotals rows={rows} />
+        <RepoTrafficMinValue minValue={minValue} onChange={onChangeMinValue} />
         <RepoTrafficFilter value={filterString} onChange={(value: string) => setFilterString(value.toLowerCase())} />
       </StyledControlBar>
-      <RepoTrafficTable rows={filteredRows} />
+      <RepoTrafficTable rows={filteredRows} minValue={minValue} />
       {renderToast()}
     </>
   )

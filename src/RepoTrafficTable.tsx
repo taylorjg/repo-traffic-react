@@ -5,6 +5,7 @@ import { RepoData } from './types'
 
 export type RepoTrafficTableProps = {
   rows: RepoData[]
+  minValue: number
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -52,7 +53,7 @@ const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sor
     : (a, b) => -descendingComparator(a, b, sortBy)
 }
 
-const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
+const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows, minValue }) => {
 
   const [sortBy, setSortBy] = useState<keyof RepoData>('viewsCount')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -76,10 +77,12 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
 
   const filterRows = (rows: RepoData[]): RepoData[] => {
     return rows.filter(row => (
-      row.viewsCount > 0 ||
-      row.clonesCount > 0 ||
-      row.forksCount > 0 ||
-      row.starsCount > 0
+      row.viewsCount >= minValue ||
+      row.viewsUniques >= minValue ||
+      row.clonesCount >= minValue ||
+      row.clonesUniques >= minValue ||
+      row.forksCount >= minValue ||
+      row.starsCount >= minValue
     ))
   }
 
