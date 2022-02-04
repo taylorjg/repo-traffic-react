@@ -41,12 +41,12 @@ const sumBy = <T,>(xs: T[], fn: (x: T) => number): number => {
 const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ rows }) => {
 
   const totalRepos = rows.length
-  const totalViews = sumBy(rows, row => row.viewsCount)
-  const totalViewers = sumBy(rows, row => row.viewsUniques)
-  const totalClones = sumBy(rows, row => row.clonesCount)
-  const totalCloners = sumBy(rows, row => row.clonesUniques)
-  const totalForks = sumBy(rows, row => row.forksCount)
-  const totalStars = sumBy(rows, row => row.starsCount)
+  const totalViews = sumBy(rows, row => row.views)
+  const totalViewers = sumBy(rows, row => row.viewers)
+  const totalClones = sumBy(rows, row => row.clones)
+  const totalCloners = sumBy(rows, row => row.cloners)
+  const totalForks = sumBy(rows, row => row.forks)
+  const totalStars = sumBy(rows, row => row.stars)
 
   const onChange = (_event: React.SyntheticEvent, expanded: boolean) => {
     gtag('event', expanded ? 'open_totals' : 'close_totals')

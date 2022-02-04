@@ -142,12 +142,12 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           updatedAt: repo.updated_at,
           htmlUrl: repo.html_url,
           language: repo.language,
-          starsCount: repo.stargazers_count,
-          forksCount: repo.forks_count,
-          viewsCount: viewsResults[index].data.count,
-          viewsUniques: viewsResults[index].data.uniques,
-          clonesCount: clonesResults[index].data.count,
-          clonesUniques: clonesResults[index].data.uniques
+          stars: repo.stargazers_count,
+          forks: repo.forks_count,
+          views: viewsResults[index].data.count,
+          viewers: viewsResults[index].data.uniques,
+          clones: clonesResults[index].data.count,
+          cloners: clonesResults[index].data.uniques
         })
       })
     }

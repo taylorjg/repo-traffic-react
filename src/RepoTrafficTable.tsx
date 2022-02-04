@@ -26,12 +26,12 @@ type HeadCell = {
 const headCells: HeadCell[] = [
   { property: 'name', label: 'Name', initialSortDirection: 'asc' },
   { property: 'language', label: 'Language', initialSortDirection: 'asc' },
-  { property: 'viewsCount', label: 'Views', initialSortDirection: 'desc' },
-  { property: 'viewsUniques', label: 'Viewers', initialSortDirection: 'desc' },
-  { property: 'clonesCount', label: 'Clones', initialSortDirection: 'desc' },
-  { property: 'clonesUniques', label: 'Cloners', initialSortDirection: 'desc' },
-  { property: 'forksCount', label: 'Forks', initialSortDirection: 'desc' },
-  { property: 'starsCount', label: 'Stars', initialSortDirection: 'desc' }
+  { property: 'views', label: 'Views', initialSortDirection: 'desc' },
+  { property: 'viewers', label: 'Viewers', initialSortDirection: 'desc' },
+  { property: 'clones', label: 'Clones', initialSortDirection: 'desc' },
+  { property: 'cloners', label: 'Cloners', initialSortDirection: 'desc' },
+  { property: 'forks', label: 'Forks', initialSortDirection: 'desc' },
+  { property: 'stars', label: 'Stars', initialSortDirection: 'desc' }
 ]
 
 // Trailing comma after the type parameter is required so that the compiler
@@ -55,7 +55,7 @@ const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sor
 
 const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows, minValue }) => {
 
-  const [sortBy, setSortBy] = useState<keyof RepoData>('viewsCount')
+  const [sortBy, setSortBy] = useState<keyof RepoData>('views')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   useEffect(() => {
@@ -77,12 +77,12 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows, minValue }) =
 
   const filterRows = (rows: RepoData[]): RepoData[] => {
     return rows.filter(row => (
-      row.viewsCount >= minValue ||
-      row.viewsUniques >= minValue ||
-      row.clonesCount >= minValue ||
-      row.clonesUniques >= minValue ||
-      row.forksCount >= minValue ||
-      row.starsCount >= minValue
+      row.views >= minValue ||
+      row.viewers >= minValue ||
+      row.clones >= minValue ||
+      row.cloners >= minValue ||
+      row.forks >= minValue ||
+      row.stars >= minValue
     ))
   }
 

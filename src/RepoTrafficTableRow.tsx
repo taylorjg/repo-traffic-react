@@ -95,12 +95,12 @@ const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) =
           {repoData.language}
         </StyledLanguage>
       </TableCell>
-      <TableCell>{repoData.viewsCount}</TableCell>
-      <TableCell>{repoData.viewsUniques}</TableCell>
-      <TableCell>{repoData.clonesCount}</TableCell>
-      <TableCell>{repoData.clonesUniques}</TableCell>
-      <TableCell>{repoData.forksCount}</TableCell>
-      <TableCell>{repoData.starsCount}</TableCell>
+      <TableCell>{repoData.views}</TableCell>
+      <TableCell>{repoData.viewers}</TableCell>
+      <TableCell>{repoData.clones}</TableCell>
+      <TableCell>{repoData.cloners}</TableCell>
+      <TableCell>{repoData.forks}</TableCell>
+      <TableCell>{repoData.stars}</TableCell>
     </TableRow>
   )
 }

@@ -6,10 +6,10 @@ export type RepoData = {
   htmlUrl: string,
   createdAt: string,
   updatedAt: string
-  forksCount: number,
-  starsCount: number,
-  viewsCount: number,
-  viewsUniques: number,
-  clonesCount: number,
-  clonesUniques: number
+  forks: number,
+  stars: number,
+  views: number,
+  viewers: number,
+  clones: number,
+  cloners: number
 }

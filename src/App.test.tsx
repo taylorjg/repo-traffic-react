@@ -18,12 +18,12 @@ const handlers = [
           "updatedAt": "2021-02-02T02:00:00Z",
           "htmlUrl": "https://github.com/taylorjg/repo1",
           "language": "TypeScript",
-          "starsCount": 1,
-          "forksCount": 2,
-          "viewsCount": 3,
-          "viewsUniques": 4,
-          "clonesCount": 5,
-          "clonesUniques": 6
+          "stars": 1,
+          "forks": 2,
+          "views": 3,
+          "viewers": 4,
+          "clones": 5,
+          "cloners": 6
         },
         {
           "id": 2,
@@ -33,12 +33,12 @@ const handlers = [
           "updatedAt": "2021-04-04T04:00:00Z",
           "htmlUrl": "https://github.com/taylorjg/repo2",
           "language": "TypeScript",
-          "starsCount": 7,
-          "forksCount": 8,
-          "viewsCount": 9,
-          "viewsUniques": 10,
-          "clonesCount": 11,
-          "clonesUniques": 12
+          "stars": 7,
+          "forks": 8,
+          "views": 9,
+          "viewers": 10,
+          "clones": 11,
+          "cloners": 12
         }
       ]
       )
