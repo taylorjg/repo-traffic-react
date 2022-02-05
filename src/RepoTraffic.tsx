@@ -64,9 +64,22 @@ const RepoTraffic = () => {
     setMinValue(minValue)
   }
 
-  const filteredRows = filterString
-    ? rows.filter(row => row.name.toLowerCase().includes(filterString))
-    : rows
+  const filterPredicate1 = filterString
+    ? (row: RepoData) => row.name.toLowerCase().includes(filterString)
+    : (_row: RepoData) => true
+
+  const filterPredicate2 = (row: RepoData) => (
+    row.views >= minValue ||
+    row.viewers >= minValue ||
+    row.clones >= minValue ||
+    row.cloners >= minValue ||
+    row.forks >= minValue ||
+    row.stars >= minValue
+  )
+
+  const filteredRows = rows
+    .filter(filterPredicate1)
+    .filter(filterPredicate2)
 
   return (
     <>
@@ -86,7 +99,7 @@ const RepoTraffic = () => {
         <RepoTrafficMinValue minValue={minValue} onChange={onChangeMinValue} />
         <RepoTrafficFilter value={filterString} onChange={(value: string) => setFilterString(value.toLowerCase())} />
       </StyledControlBar>
-      <RepoTrafficTable rows={filteredRows} minValue={minValue} />
+      <RepoTrafficTable rows={filteredRows} />
       {renderToast()}
     </>
   )

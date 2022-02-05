@@ -5,7 +5,6 @@ import { RepoData } from './types'
 
 export type RepoTrafficTableProps = {
   rows: RepoData[]
-  minValue: number
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -35,7 +34,7 @@ const headCells: HeadCell[] = [
 ]
 
 // Trailing comma after the type parameter is required so that the compiler
-// doesn't think this is JSX opening element tag.
+// doesn't think this is a JSX opening element tag.
 const descendingComparator = <T,>(a: T, b: T, sortBy: keyof T) => {
   if (b[sortBy] < a[sortBy]) {
     return -1
@@ -53,7 +52,7 @@ const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sor
     : (a, b) => -descendingComparator(a, b, sortBy)
 }
 
-const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows, minValue }) => {
+const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
 
   const [sortBy, setSortBy] = useState<keyof RepoData>('views')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -74,17 +73,6 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows, minValue }) =
       }
       setSortBy(headCell.property)
     }
-
-  const filterRows = (rows: RepoData[]): RepoData[] => {
-    return rows.filter(row => (
-      row.views >= minValue ||
-      row.viewers >= minValue ||
-      row.clones >= minValue ||
-      row.cloners >= minValue ||
-      row.forks >= minValue ||
-      row.stars >= minValue
-    ))
-  }
 
   const sortRows = (rows: RepoData[]): RepoData[] => {
     return rows.slice().sort(getComparator(sortDirection, sortBy))
@@ -109,7 +97,7 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows, minValue }) =
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortRows(filterRows(rows)).map((repoData: RepoData) => (
+          {sortRows(rows).map((repoData: RepoData) => (
             <RepoTrafficTableRow key={repoData.id} repoData={repoData} />
           ))}
         </TableBody>
