@@ -79,7 +79,10 @@ const RepoTraffic = () => {
       />
       <NetworkActivityProgressBar isActive={isFetching} />
       <StyledControlBar>
-        <RepoTrafficTotals rows={rows} />
+        <div>
+          <RepoTrafficTotals label="Overall Totals" rows={rows} />
+          <RepoTrafficTotals label="Filtered Totals" rows={filteredRows} />
+        </div>
         <RepoTrafficMinValue minValue={minValue} onChange={onChangeMinValue} />
         <RepoTrafficFilter value={filterString} onChange={(value: string) => setFilterString(value.toLowerCase())} />
       </StyledControlBar>

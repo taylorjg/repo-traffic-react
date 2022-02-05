@@ -31,6 +31,7 @@ const Total: React.FC<TotalProps> = ({ label, value }) => {
 }
 
 export type RepoTrafficTotalsProps = {
+  label: string
   rows: RepoData[]
 }
 
@@ -38,7 +39,7 @@ const sumBy = <T,>(xs: T[], fn: (x: T) => number): number => {
   return xs.reduce((acc: number, x: T) => acc + fn(x), 0)
 }
 
-const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ rows }) => {
+const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ label, rows }) => {
 
   const totalRepos = rows.length
   const totalViews = sumBy(rows, row => row.views)
@@ -49,13 +50,13 @@ const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ rows }) => {
   const totalStars = sumBy(rows, row => row.stars)
 
   const onChange = (_event: React.SyntheticEvent, expanded: boolean) => {
-    gtag('event', expanded ? 'open_totals' : 'close_totals')
+    gtag('event', expanded ? 'open_totals' : 'close_totals', { label })
   }
 
   return (
     <Accordion onChange={onChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography>Totals</Typography>
+        <Typography>{label}</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Total label="Total repos" value={totalRepos} />
