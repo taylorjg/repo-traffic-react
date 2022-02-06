@@ -1,3 +1,7 @@
+export type UserData = {
+  login: string
+}
+
 export type RepoData = {
   id: number
   name: string
@@ -14,4 +18,9 @@ export type RepoData = {
   viewers: number
   clones: number
   cloners: number
+}
+
+export type GitHubData = {
+  user: UserData
+  repos: [RepoData]
 }

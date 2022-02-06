@@ -8,7 +8,7 @@ import RepoTrafficTotals from './RepoTrafficTotals'
 import RepoTrafficFilter from './RepoTrafficFilter'
 import RepoTrafficMinValue from './RepoTrafficMinValue'
 import RepoTrafficTable from './RepoTrafficTable'
-import { RepoData } from './types'
+import { GitHubData, RepoData } from './types'
 import { useToast } from './Toast'
 import styled from '@emotion/styled'
 
@@ -32,7 +32,7 @@ const RepoTraffic = () => {
   const { renderToast, showError } = useToast()
   const navigate = useNavigate()
 
-  const queryResult = useQuery<RepoData[], Error>(
+  const queryResult = useQuery<GitHubData, Error>(
     'getRepos',
     () => axios.get('/api/repos').then(({ data }) => data),
     {
@@ -48,7 +48,9 @@ const RepoTraffic = () => {
       }
     })
 
-  const { isFetching, data: rows = [] } = queryResult
+  const { isFetching, data } = queryResult
+
+  const rows = data?.repos ?? []
 
   const onRefresh = () => {
     if (!queryResult.isFetching) {

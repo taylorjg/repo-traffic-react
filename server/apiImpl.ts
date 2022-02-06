@@ -162,7 +162,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
 
     const asyncReposIter = runGraphQLQuery(client, REPOS_QUERY, variables, repoLimit)
 
-    const results: any[] = []
+    const repos: any[] = []
 
     for await (const reposChunk of asyncSplitEvery(asyncReposIter, MAX_PARALLEL_TRAFFIC_CALLS)) {
       log.info('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
@@ -172,7 +172,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       const viewsResults = responses.slice(0, reposChunk.length)
       const clonesResults = responses.slice(reposChunk.length)
       reposChunk.forEach((repo: any, index: number) => {
-        results.push({
+        repos.push({
           id: repo.id,
           name: repo.name,
           description: repo.description,
@@ -192,7 +192,14 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       })
     }
     await displayV3RateLimitData(axiosInstance, 'after')
-    return { success: results }
+    return {
+      success: {
+        user: {
+          login
+        },
+        repos
+      }
+    }
   } catch (e: unknown) {
     const errorMessage = getErrorMessage(e)
     log.error('[getReposImpl]', errorMessage)

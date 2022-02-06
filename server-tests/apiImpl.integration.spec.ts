@@ -15,7 +15,8 @@ describe('apiImpl integration tests', () => {
         GITHUB_CLIENT_SECRET!,
         GITHUB_TOKEN_VALID!,
         10)
-      expect(outcome.success).toHaveLength(10)
-    })
+      const repos = outcome.success?.repos ?? []
+      expect(repos).toHaveLength(10)
+    }, 10000)
   })
 })
