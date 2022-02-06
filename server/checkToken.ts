@@ -1,12 +1,13 @@
 import axios from 'axios'
 import log from 'loglevel'
 import { getErrorMessage } from './errorUtils'
+import * as C from './constants'
 
 // https://docs.github.com/rest/reference/apps#check-a-token
 export const checkToken = async (clientId: string, clientSecret: string, token: string) => {
   try {
     if (!token) return undefined
-    const url = `https://api.github.com/applications/${clientId}/token`
+    const url = `${C.GITHUB_API_URL_V3}/applications/${clientId}/token`
     const data = { access_token: token }
     const config = {
       auth: {

@@ -4,6 +4,7 @@ import log from 'loglevel'
 import { checkToken } from './checkToken'
 import { conditionalRequest } from './conditionalRequest'
 import { getErrorMessage } from './errorUtils'
+import * as C from './constants'
 
 const MAX_REPOS_PER_PAGE = 100
 const MAX_PARALLEL_TRAFFIC_CALLS = 25
@@ -100,7 +101,7 @@ const displayV3RateLimitData = async (axiosInstance: AxiosInstance, when: string
   const core = data.resources.core
   const { limit, used, remaining } = core
   const reset = new Date(core.reset * 1000).toLocaleString()
-  log.info(`[displayRateLimitData (${when})] limit: ${limit}; used: ${used}; remaining: ${remaining}; reset: ${reset}`)
+  log.info(`[displayV3RateLimitData (${when})] limit: ${limit}; used: ${used}; remaining: ${remaining}; reset: ${reset}`)
   return data
 }
 
@@ -120,7 +121,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
 
   try {
     const axiosInstance = axios.create({
-      baseURL: 'https://api.github.com',
+      baseURL: C.GITHUB_API_URL_V3,
       headers: {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': `token ${token}`
@@ -130,7 +131,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
     await displayV3RateLimitData(axiosInstance, 'before')
 
     const client = new GraphQLClient(
-      'https://api.github.com/graphql',
+      C.GITHUB_API_URL_V4,
       {
         headers: {
           'Authorization': `bearer ${token}`

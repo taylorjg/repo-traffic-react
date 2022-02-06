@@ -1,13 +1,14 @@
 import 'dotenv/config'
 import axios from 'axios'
 import { conditionalRequest } from '../server/conditionalRequest'
+import * as C from '../server/constants'
 
 const { GITHUB_TOKEN_VALID } = process.env
 
 describe('conditionalRequest integration tests', () => {
 
   const axiosInstance = axios.create({
-    baseURL: 'https://api.github.com',
+    baseURL: C.GITHUB_API_URL_V3,
     headers: {
       'Accept': 'application/vnd.github.v3+json',
       'Authorization': `token ${GITHUB_TOKEN_VALID}`
