@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
+import { GraphQLClient, gql } from 'graphql-request'
 import log from 'loglevel'
 import { checkToken } from './checkToken'
 import { conditionalRequest } from './conditionalRequest'
@@ -7,22 +8,32 @@ import { getErrorMessage } from './errorUtils'
 const MAX_REPOS_PER_PAGE = 100
 const MAX_PARALLEL_TRAFFIC_CALLS = 25
 
-// https://docs.github.com/en/rest/overview/resources-in-the-rest-api#pagination
-export const parseLinkHeader = (linkHeader: string) => {
-  if (!linkHeader) {
-    return []
+const REPOS_QUERY = gql`
+  query ReposQuery($query: String!, $first: Int!, $after: String) {
+    search(type: REPOSITORY, query: $query, first: $first, after: $after) {
+      nodes {
+        ... on Repository {
+          id
+          name
+          description
+          url
+          createdAt
+          updatedAt
+          forkCount
+          stargazerCount
+          primaryLanguage {
+            name
+            color
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
   }
-  return linkHeader
-    .split(',')
-    .map(link => link.split(';').map(s => s.trim()))
-    .map(([hrefPart, relPart]) => {
-      const hrefMatch = /^<([^>]+)>$/.exec(hrefPart ?? '')
-      const relMatch = /^rel="([^"]+)"$/.exec(relPart ?? '')
-      const href = hrefMatch?.[1] ?? ''
-      const rel = relMatch?.[1] ?? ''
-      return { href, rel }
-    })
-}
+`
 
 export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): AsyncGenerator<T[]> {
   let chunk: T[] = []
@@ -38,52 +49,37 @@ export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): Asy
   }
 }
 
-export async function* getItemsGen(
-  axiosInstance: AxiosInstance,
-  initialUrl: string,
-  options: {
-    pageSize?: number,
-    maxItems?: number
-  } = {}
+export async function* runGraphQLQuery(
+  client: GraphQLClient,
+  query: string,
+  variables: object,
+  repoLimit: number
 ): AsyncGenerator<any> {
-
-  async function* helper(url: string, itemCountSoFar: number): AsyncGenerator<any> {
-
-    log.info('[getItemsGen helper]', 'url:', url)
-
-    let maybePerPageParam = {}
-    if (options.pageSize) {
-      if (options.maxItems) {
-        const remainingItems = options.maxItems - itemCountSoFar
-        maybePerPageParam = { per_page: Math.min(options.pageSize, remainingItems) }
+  let yieldedSoFar = 0
+  for (; ;) {
+    const data = await client.request(query, variables)
+    const hasNextPage = data.search.pageInfo.hasNextPage
+    const after = data.search.pageInfo.endCursor
+    const repos = data.search.nodes
+    const reposCount = repos.length
+    if (repoLimit <= 0) {
+      yield* repos
+    } else {
+      const remainingLimit = repoLimit - yieldedSoFar
+      if (remainingLimit < reposCount) {
+        yield* repos.slice(0, remainingLimit)
+        break
       } else {
-        maybePerPageParam = { per_page: options.pageSize }
+        yield* repos
+        yieldedSoFar += reposCount
       }
     }
-
-    const config = {
-      params: {
-        ...maybePerPageParam
-      }
-    }
-
-    const response = await axiosInstance.get(url, config)
-    const items = response.data
-    yield* items
-
-    const linkHeader = response.headers['link']
-    const links = parseLinkHeader(linkHeader)
-    const nextLink = links.find(({ rel }) => rel === 'next')
-    if (nextLink) {
-      const newItemCountSoFar = itemCountSoFar + items.length
-      if (options.maxItems && newItemCountSoFar >= options.maxItems) {
-        return
-      }
-      yield* helper(nextLink.href, newItemCountSoFar)
+    if (hasNextPage) {
+      (variables as any).after = after
+    } else {
+      break
     }
   }
-
-  yield* helper(initialUrl, 0)
 }
 
 const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) => {
@@ -108,7 +104,6 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
   log.info('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl:', reposUrl)
 
   try {
-
     const axiosInstance = axios.create({
       baseURL: 'https://api.github.com',
       headers: {
@@ -117,19 +112,30 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       }
     })
 
+    const client = new GraphQLClient(
+      'https://api.github.com/graphql',
+      {
+        headers: {
+          'Authorization': `bearer ${token}`
+        }
+      }
+    )
+
     await displayRateLimitData(axiosInstance, 'before')
 
-    const asyncReposIter = getItemsGen(axiosInstance, reposUrl, {
-      pageSize: MAX_REPOS_PER_PAGE,
-      maxItems: repoLimit
-    })
+    const variables = {
+      first: MAX_REPOS_PER_PAGE,
+      query: `user:${login} fork:false`
+    }
+
+    const asyncReposIter = runGraphQLQuery(client, REPOS_QUERY, variables, repoLimit)
 
     const results: any[] = []
 
     for await (const reposChunk of asyncSplitEvery(asyncReposIter, MAX_PARALLEL_TRAFFIC_CALLS)) {
       log.info('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
-      const viewsPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${repo.owner.login}/${repo.name}/traffic/views`))
-      const clonesPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${repo.owner.login}/${repo.name}/traffic/clones`))
+      const viewsPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${login}/${repo.name}/traffic/views`))
+      const clonesPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${login}/${repo.name}/traffic/clones`))
       const responses = await Promise.all([...viewsPromises, ...clonesPromises])
       const viewsResults = responses.slice(0, reposChunk.length)
       const clonesResults = responses.slice(reposChunk.length)
@@ -138,12 +144,13 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           id: repo.id,
           name: repo.name,
           description: repo.description,
-          createdAt: repo.created_at,
-          updatedAt: repo.updated_at,
-          htmlUrl: repo.html_url,
-          language: repo.language,
-          stars: repo.stargazers_count,
-          forks: repo.forks_count,
+          createdAt: repo.createdAt,
+          updatedAt: repo.updatedAt,
+          htmlUrl: repo.url,
+          language: repo.primaryLanguage?.name,
+          languageColour: repo.primaryLanguage?.color,
+          stars: repo.stargazerCount,
+          forks: repo.forkCount,
           views: viewsResults[index].data.count,
           viewers: viewsResults[index].data.uniques,
           clones: clonesResults[index].data.count,

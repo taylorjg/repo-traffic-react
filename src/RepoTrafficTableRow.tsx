@@ -2,21 +2,13 @@ import { Link, TableCell, TableRow, Tooltip } from '@mui/material'
 import OpenInNew from '@mui/icons-material/OpenInNew'
 import { RepoData } from './types'
 import styled from '@emotion/styled'
-import colors from './colors.json'
 
 export type RepoTrafficTableRowProps = {
   repoData: RepoData
 }
 
-const languageToBorder = (language: string) => {
-  const entry = (colors as any)[language]
-  return entry && entry.color
-    ? `2px solid ${entry.color}`
-    : "unset"
-}
-
-const StyledLanguage = styled.div<{ language: string }>`
-  border: ${props => languageToBorder(props.language)};
+const StyledLanguage = styled.div<{ colour: string }>`
+  border: ${props => `2px solid ${props.colour}`};
   text-align: center;
 `
 
@@ -91,7 +83,7 @@ const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) =
         </AlignedIcon>
       </TableCell>
       <TableCell>
-        <StyledLanguage language={repoData.language}>
+        <StyledLanguage colour={repoData.languageColour}>
           {repoData.language}
         </StyledLanguage>
       </TableCell>

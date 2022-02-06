@@ -3,6 +3,7 @@ export type RepoData = {
   name: string,
   description: string,
   language: string,
+  languageColour: string,
   htmlUrl: string,
   createdAt: string,
   updatedAt: string
