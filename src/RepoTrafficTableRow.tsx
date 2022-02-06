@@ -25,6 +25,7 @@ const StyledOpenInNew = styled(OpenInNew)`
 const StyledTooltipLabelCell = styled.td`
   font-weight: bold;
   vertical-align: top;
+  min-width: 6rem;
 `
 
 const StyledTooltipValueCell = styled.td`
@@ -59,6 +60,7 @@ const RepoTooltip: React.FC<RepoTooltipProps> = ({ repoData, children }) => {
           <StyledTooltipRow label="Description:" value={repoData.description} />
           <StyledTooltipRow label="Created At:" value={formatDateString(repoData.createdAt)} />
           <StyledTooltipRow label="Updated At:" value={formatDateString(repoData.updatedAt)} />
+          <StyledTooltipRow label="Last Commit At:" value={formatDateString(repoData.lastCommitAt)} />
         </tbody>
       </table>}
       arrow>

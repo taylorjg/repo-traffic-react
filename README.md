@@ -27,6 +27,7 @@ and provide a button to start the process
 * Express
 * Async/await, generators and async generators
 * GitHub REST API
+* GitHub GraphQL API
 * Deployment to Heroku
 
 # Things in this project that were new to me
@@ -34,6 +35,7 @@ and provide a button to start the process
 * Node.js Express server **with TypeScript**
 * React **with TypeScript**
 * react-query
+* graphql-request
 * MUI
 * GitHub OAuth Apps
 * CI/CD workflow using GitHub Actions

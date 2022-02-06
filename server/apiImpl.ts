@@ -38,6 +38,22 @@ const REPOS_QUERY = gql`
           owner {
             login
           }
+          # https://stackoverflow.com/a/48290822
+          defaultBranchRef {
+            target {
+              ... on Commit {
+                history(first: 1) {
+                  edges {
+                    node {
+                      ... on Commit {
+                        committedDate
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }          
         }
       }
       pageInfo {
@@ -162,6 +178,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           description: repo.description,
           createdAt: repo.createdAt,
           updatedAt: repo.updatedAt,
+          lastCommitAt: repo.defaultBranchRef.target.history.edges[0].node.committedDate,
           htmlUrl: repo.url,
           language: repo.primaryLanguage?.name,
           languageColour: repo.primaryLanguage?.color,
