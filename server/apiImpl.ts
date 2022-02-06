@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-import { GraphQLClient, gql } from 'graphql-request'
+import { GraphQLClient, RequestDocument, Variables, gql } from 'graphql-request'
 import log from 'loglevel'
 import { checkToken } from './checkToken'
 import { conditionalRequest } from './conditionalRequest'
@@ -10,6 +10,15 @@ const MAX_PARALLEL_TRAFFIC_CALLS = 25
 
 const REPOS_QUERY = gql`
   query ReposQuery($query: String!, $first: Int!, $after: String) {
+
+    rateLimit {
+      cost
+      limit
+      remaining
+      resetAt
+      used
+    }
+
     search(type: REPOSITORY, query: $query, first: $first, after: $after) {
       nodes {
         ... on Repository {
@@ -24,6 +33,9 @@ const REPOS_QUERY = gql`
           primaryLanguage {
             name
             color
+          }
+          owner {
+            login
           }
         }
       }
@@ -49,15 +61,16 @@ export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): Asy
   }
 }
 
-export async function* runGraphQLQuery(
+async function* runGraphQLQuery(
   client: GraphQLClient,
-  query: string,
-  variables: object,
+  query: RequestDocument,
+  variables: Variables,
   repoLimit: number
 ): AsyncGenerator<any> {
   let yieldedSoFar = 0
   for (; ;) {
     const data = await client.request(query, variables)
+    log.info('[runGraphQLQuery]', 'rateLimit:', data.rateLimit)
     const hasNextPage = data.search.pageInfo.hasNextPage
     const after = data.search.pageInfo.endCursor
     const repos = data.search.nodes
@@ -82,7 +95,7 @@ export async function* runGraphQLQuery(
   }
 }
 
-const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) => {
+const displayV3RateLimitData = async (axiosInstance: AxiosInstance, when: string) => {
   const { data } = await axiosInstance.get('/rate_limit')
   const core = data.resources.core
   const { limit, used, remaining } = core
@@ -90,6 +103,9 @@ const displayRateLimitData = async (axiosInstance: AxiosInstance, when: string) 
   log.info(`[displayRateLimitData (${when})] limit: ${limit}; used: ${used}; remaining: ${remaining}; reset: ${reset}`)
   return data
 }
+
+const makeTrafficUrl = (repo: any, trafficType: string) =>
+  `/repos/${repo.owner.login}/${repo.name}/traffic/${trafficType}`
 
 export const getReposImpl = async (clientId: string, clientSecret: string, token: string, repoLimit: number) => {
 
@@ -100,8 +116,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
   const appName = checkTokenData.app.name
   const appUrl = checkTokenData.app.url
   const login = checkTokenData.user.login
-  const reposUrl = checkTokenData.user.repos_url
-  log.info('[getReposImpl]', 'appName:', appName, 'appUrl:', appUrl, 'login:', login, 'reposUrl:', reposUrl)
+  log.info('[getReposImpl]', { appName, appUrl, login })
 
   try {
     const axiosInstance = axios.create({
@@ -112,6 +127,8 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       }
     })
 
+    await displayV3RateLimitData(axiosInstance, 'before')
+
     const client = new GraphQLClient(
       'https://api.github.com/graphql',
       {
@@ -121,11 +138,9 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       }
     )
 
-    await displayRateLimitData(axiosInstance, 'before')
-
     const variables = {
       first: MAX_REPOS_PER_PAGE,
-      query: `user:${login} fork:false`
+      query: `user:${login} fork:true`
     }
 
     const asyncReposIter = runGraphQLQuery(client, REPOS_QUERY, variables, repoLimit)
@@ -134,8 +149,8 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
 
     for await (const reposChunk of asyncSplitEvery(asyncReposIter, MAX_PARALLEL_TRAFFIC_CALLS)) {
       log.info('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
-      const viewsPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${login}/${repo.name}/traffic/views`))
-      const clonesPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, `/repos/${login}/${repo.name}/traffic/clones`))
+      const viewsPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, makeTrafficUrl(repo, 'views')))
+      const clonesPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, makeTrafficUrl(repo, 'clones')))
       const responses = await Promise.all([...viewsPromises, ...clonesPromises])
       const viewsResults = responses.slice(0, reposChunk.length)
       const clonesResults = responses.slice(reposChunk.length)
@@ -158,10 +173,11 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
         })
       })
     }
-    await displayRateLimitData(axiosInstance, 'after')
+    await displayV3RateLimitData(axiosInstance, 'after')
     return { success: results }
   } catch (e: unknown) {
-    log.error('[getReposImpl]', getErrorMessage(e))
-    return { error: true }
+    const errorMessage = getErrorMessage(e)
+    log.error('[getReposImpl]', errorMessage)
+    return { error: true, errorMessage }
   }
 }
