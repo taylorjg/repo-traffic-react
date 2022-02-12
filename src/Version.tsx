@@ -1,9 +1,17 @@
+import styled from '@emotion/styled'
 import { version } from '../package.json'
-import './Version.css'
+
+const StyledVersion = styled.span`
+  font-style: italic;
+  font-size: smaller;
+  position: fixed;
+  bottom: .5rem;
+  right: .5rem;
+`
 
 const Version = () => {
   return (
-    <span className="version">version: {version}</span>
+    <StyledVersion>version: {version}</StyledVersion>
   )
 }
 
