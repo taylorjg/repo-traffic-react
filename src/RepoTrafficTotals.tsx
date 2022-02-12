@@ -25,7 +25,7 @@ const Total: React.FC<TotalProps> = ({ label, value }) => {
   return (
     <StyledTotal>
       <StyledTotalLabel>{label}:</StyledTotalLabel>
-      <StyledTotalValue>{value}</StyledTotalValue>
+      <StyledTotalValue>{value.toLocaleString()}</StyledTotalValue>
     </StyledTotal>
   )
 }

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-import { GraphQLClient, RequestDocument, Variables, gql } from 'graphql-request'
+import { GraphQLClient, gql } from 'graphql-request'
 import log from 'loglevel'
 import { checkToken } from './checkToken'
 import { conditionalRequest } from './conditionalRequest'
@@ -9,8 +9,19 @@ import * as C from './constants'
 const MAX_REPOS_PER_PAGE = 100
 const MAX_PARALLEL_TRAFFIC_CALLS = 25
 
-const REPOS_QUERY = gql`
-  query ReposQuery($query: String!, $first: Int!, $after: String) {
+const USER_QUERY = gql`
+  query UserQuery($login: String!) {
+
+    user(login: $login) {
+      login
+      name
+      bio
+      location
+      company
+      url
+      avatarUrl
+      websiteUrl
+    }
 
     rateLimit {
       cost
@@ -19,6 +30,11 @@ const REPOS_QUERY = gql`
       resetAt
       used
     }
+  }
+`
+
+const REPOS_QUERY = gql`
+  query ReposQuery($query: String!, $first: Int!, $after: String) {
 
     search(type: REPOSITORY, query: $query, first: $first, after: $after) {
       nodes {
@@ -61,6 +77,14 @@ const REPOS_QUERY = gql`
         endCursor
       }
     }
+
+    rateLimit {
+      cost
+      limit
+      remaining
+      resetAt
+      used
+    }
   }
 `
 
@@ -78,16 +102,33 @@ export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): Asy
   }
 }
 
-async function* runGraphQLQuery(
+const runUserQuery = async (
   client: GraphQLClient,
-  query: RequestDocument,
-  variables: Variables,
+  login: string
+) => {
+  const variables = {
+    login
+  }
+  const data = await client.request(USER_QUERY, variables)
+  log.info('[runUserQuery]', 'user:', data.user)
+  log.info('[runUserQuery]', 'rateLimit:', data.rateLimit)
+  return data.user
+}
+
+async function* runReposQuery(
+  client: GraphQLClient,
+  login: string,
   repoLimit: number
 ): AsyncGenerator<any> {
+  const variables = {
+    first: MAX_REPOS_PER_PAGE,
+    query: `user:${login} fork:true`
+  }
+
   let yieldedSoFar = 0
   for (; ;) {
-    const data = await client.request(query, variables)
-    log.info('[runGraphQLQuery]', 'rateLimit:', data.rateLimit)
+    const data = await client.request(REPOS_QUERY, variables)
+    log.info('[runReposQuery]', 'rateLimit:', data.rateLimit)
     const hasNextPage = data.search.pageInfo.hasNextPage
     const after = data.search.pageInfo.endCursor
     const repos = data.search.nodes
@@ -155,12 +196,8 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
       }
     )
 
-    const variables = {
-      first: MAX_REPOS_PER_PAGE,
-      query: `user:${login} fork:true`
-    }
-
-    const asyncReposIter = runGraphQLQuery(client, REPOS_QUERY, variables, repoLimit)
+    const user = await runUserQuery(client, login)
+    const asyncReposIter = runReposQuery(client, login, repoLimit)
 
     const repos: any[] = []
 
@@ -194,9 +231,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
     await displayV3RateLimitData(axiosInstance, 'after')
     return {
       success: {
-        user: {
-          login
-        },
+        user,
         repos
       }
     }

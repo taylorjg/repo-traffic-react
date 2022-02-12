@@ -1,5 +1,7 @@
 export type UserData = {
   login: string
+  name: string
+  location: string
 }
 
 export type RepoData = {

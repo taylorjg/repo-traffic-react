@@ -10,7 +10,7 @@ const Code = styled.span`
   margin: 0;
   font-size: 85%;
   color: white;
-  background-color: rgba(110,118,129,0.4);
+  background-color: rgba(110, 118, 129, 0.4);
   border-radius: 6px;
 `
 
