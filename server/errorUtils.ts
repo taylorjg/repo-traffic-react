@@ -1,6 +1,9 @@
 import axios from 'axios'
+import log from 'loglevel'
 
 export const getErrorMessage = (e: unknown) => {
+
+  log.error('[getErrorMessage]', e)
 
   if (axios.isAxiosError(e) && e.response) {
 
