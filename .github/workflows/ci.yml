@@ -19,14 +19,14 @@ jobs:
           ENCRYPT_COOKIE_PASSWORD: ${{ secrets.ENCRYPT_COOKIE_PASSWORD }}
           GITHUB_TOKEN_VALID: ${{ secrets.TOKEN_VALID }}
           GITHUB_TOKEN_REVOKED: ${{ secrets.TOKEN_REVOKED }}
-  deploy-to-heroku:
+  deploy:
     needs: run-unit-tests
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
+      - name: Render Deploy Action
+        uses: johnbeynon/render-deploy-action@v0.0.8
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
