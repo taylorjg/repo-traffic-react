@@ -43,6 +43,7 @@ const REPOS_QUERY = gql`
           name
           description
           url
+          websiteUrl
           createdAt
           updatedAt
           forkCount
@@ -217,6 +218,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           updatedAt: repo.updatedAt,
           lastCommitAt: repo.defaultBranchRef.target.history.edges[0].node.committedDate,
           htmlUrl: repo.url,
+          websiteUrl: repo.websiteUrl,
           language: repo.primaryLanguage?.name,
           languageColour: repo.primaryLanguage?.color,
           stars: repo.stargazerCount,
