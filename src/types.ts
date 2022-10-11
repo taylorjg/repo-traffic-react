@@ -11,6 +11,7 @@ export type RepoData = {
   language: string
   languageColour: string
   htmlUrl: string
+  homepageUrl: string
   createdAt: string
   updatedAt: string
   lastCommitAt: string

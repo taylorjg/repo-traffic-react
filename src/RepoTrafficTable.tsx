@@ -78,6 +78,9 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
     return rows.slice().sort(getComparator(sortDirection, sortBy))
   }
 
+  const sortedRows = sortRows(rows)
+  console.log("sortedRows:", JSON.stringify(sortedRows, null, 2))
+
   return (
     <TableContainer>
       <Table size="small">
@@ -97,7 +100,7 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortRows(rows).map((repoData: RepoData) => (
+          {sortedRows.map((repoData: RepoData) => (
             <RepoTrafficTableRow key={repoData.id} repoData={repoData} />
           ))}
         </TableBody>

@@ -1,5 +1,4 @@
-import { Link, TableCell, TableRow, Tooltip } from '@mui/material'
-import OpenInNew from '@mui/icons-material/OpenInNew'
+import { TableCell, TableRow, Tooltip } from '@mui/material'
 import { RepoData } from './types'
 import styled from '@emotion/styled'
 
@@ -17,11 +16,6 @@ const AlignedIcon = styled.div`
   align-items: center;
 `
 
-const StyledOpenInNew = styled(OpenInNew)`
-  margin-left: .25rem;
-  font-size: small;
-`
-
 const StyledTooltipLabelCell = styled.td`
   font-weight: bold;
   vertical-align: top;
@@ -29,19 +23,30 @@ const StyledTooltipLabelCell = styled.td`
 `
 
 const StyledTooltipValueCell = styled.td`
+  word-wrap: anywhere;
+`
+
+const StyledLink = styled.a`
+  color: inherit;
 `
 
 type StyledTooltipRowProps = {
   label: string
-  value: string
+  value: string | React.ReactNode
 }
 
-const StyledTooltipRow: React.FC<StyledTooltipRowProps> = ({ label, value }) => {
+const StyledTooltipTable = styled.table`
+`
+
+const StyledTooltipRow = styled.tr`
+`
+
+const TooltipRow: React.FC<StyledTooltipRowProps> = ({ label, value }) => {
   return (
-    <tr>
+    <StyledTooltipRow>
       <StyledTooltipLabelCell>{label}</StyledTooltipLabelCell>
       <StyledTooltipValueCell>{value}</StyledTooltipValueCell>
-    </tr>
+    </StyledTooltipRow>
   )
 }
 
@@ -55,16 +60,21 @@ type RepoTooltipProps = {
 const RepoTooltip: React.FC<RepoTooltipProps> = ({ repoData, children }) => {
   return (
     <Tooltip title={
-      <table>
+      <StyledTooltipTable>
         <tbody>
-          <StyledTooltipRow label="Description:" value={repoData.description} />
-          <StyledTooltipRow label="Created At:" value={formatDateString(repoData.createdAt)} />
-          <StyledTooltipRow label="Updated At:" value={formatDateString(repoData.updatedAt)} />
-          <StyledTooltipRow label="Last Commit At:" value={formatDateString(repoData.lastCommitAt)} />
+          <TooltipRow label="Description:" value={repoData.description} />
+          <TooltipRow label="Created At:" value={formatDateString(repoData.createdAt)} />
+          <TooltipRow label="Updated At:" value={formatDateString(repoData.updatedAt)} />
+          <TooltipRow label="Last Commit At:" value={formatDateString(repoData.lastCommitAt)} />
+          <TooltipRow label="GitHub:" value={<StyledLink href={repoData.htmlUrl}>{repoData.htmlUrl}</StyledLink>} />
+          {repoData.homepageUrl && (
+            <TooltipRow label="Website:" value={<StyledLink href={repoData.homepageUrl}>{repoData.homepageUrl}</StyledLink>} />
+          )}
         </tbody>
-      </table>}
-      arrow>
-        {children}
+      </StyledTooltipTable>}
+      arrow
+    >
+      {children}
     </Tooltip>
   )
 }
@@ -77,11 +87,11 @@ const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) =
           <RepoTooltip repoData={repoData}>
             <span>{repoData.name}</span>
           </RepoTooltip>
-          <Link href={repoData.htmlUrl}>
+          {/* <Link href={repoData.htmlUrl}>
             <AlignedIcon>
-              <StyledOpenInNew />
+              <StyledGitHubIcon />
             </AlignedIcon>
-          </Link>
+          </Link> */}
         </AlignedIcon>
       </TableCell>
       <TableCell>
