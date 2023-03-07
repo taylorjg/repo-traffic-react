@@ -69,9 +69,9 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
       if (headCell.property === sortBy) {
         setSortDirection(oppositeSortDirection(sortDirection))
       } else {
+        setSortBy(headCell.property)
         setSortDirection(headCell.initialSortDirection)
       }
-      setSortBy(headCell.property)
     }
 
   const sortRows = (rows: RepoData[]): RepoData[] => {
@@ -79,7 +79,6 @@ const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
   }
 
   const sortedRows = sortRows(rows)
-  console.log("sortedRows:", JSON.stringify(sortedRows, null, 2))
 
   return (
     <TableContainer>

@@ -4,6 +4,7 @@ import log from 'loglevel'
 import { checkToken } from './checkToken'
 import { conditionalRequest } from './conditionalRequest'
 import { getErrorMessage } from './errorUtils'
+import { splitEvery } from './utils'
 import * as C from './constants'
 
 const MAX_REPOS_PER_PAGE = 100
@@ -89,20 +90,6 @@ const REPOS_QUERY = gql`
   }
 `
 
-export async function* asyncSplitEvery<T>(xs: AsyncGenerator<T>, n: number): AsyncGenerator<T[]> {
-  let chunk: T[] = []
-  for await (const x of xs) {
-    chunk.push(x)
-    if (chunk.length === n) {
-      yield chunk
-      chunk = []
-    }
-  }
-  if (chunk.length > 0) {
-    yield chunk
-  }
-}
-
 const runUserQuery = async (
   client: GraphQLClient,
   login: string
@@ -116,42 +103,44 @@ const runUserQuery = async (
   return data.user
 }
 
-async function* runReposQuery(
+const runReposQuery = async (
   client: GraphQLClient,
   login: string,
   repoLimit: number
-): AsyncGenerator<any> {
+) => {
   const variables = {
+    query: `user:${login} fork:true sort:updated-desc`,
     first: MAX_REPOS_PER_PAGE,
-    query: `user:${login} fork:true`
+    after: undefined
   }
 
-  let yieldedSoFar = 0
+  const accumulatedRepos: any[] = []
+
   for (; ;) {
+    if (repoLimit > 0) {
+      const remaining = repoLimit - accumulatedRepos.length
+      variables.first = Math.min(MAX_REPOS_PER_PAGE, remaining)
+    }
+
     const data = await client.request(REPOS_QUERY, variables)
-    log.info('[runReposQuery]', 'rateLimit:', data.rateLimit)
+    log.info('[runReposQuery]', 'rateLimit:', data.rateLimit, 'fetched:', data.search.nodes.length)
+
     const hasNextPage = data.search.pageInfo.hasNextPage
     const after = data.search.pageInfo.endCursor
     const repos = data.search.nodes
-    const reposCount = repos.length
-    if (repoLimit <= 0) {
-      yield* repos
-    } else {
-      const remainingLimit = repoLimit - yieldedSoFar
-      if (remainingLimit < reposCount) {
-        yield* repos.slice(0, remainingLimit)
-        break
-      } else {
-        yield* repos
-        yieldedSoFar += reposCount
-      }
-    }
+
+    accumulatedRepos.push(...repos)
+
+    if (repoLimit > 0 && accumulatedRepos.length >= repoLimit) break
+
     if (hasNextPage) {
-      (variables as any).after = after
+      variables.after = after
     } else {
       break
     }
   }
+
+  return repoLimit > 0 ? accumulatedRepos.slice(0, repoLimit) : accumulatedRepos
 }
 
 const displayV3RateLimitData = async (axiosInstance: AxiosInstance, when: string) => {
@@ -198,31 +187,32 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
     )
 
     const user = await runUserQuery(client, login)
-    const asyncReposIter = runReposQuery(client, login, repoLimit)
+    const rawRepos = await runReposQuery(client, login, repoLimit)
+    const rawReposInChunks = Array.from(splitEvery(rawRepos, MAX_PARALLEL_TRAFFIC_CALLS))
 
     const repos: any[] = []
 
-    for await (const reposChunk of asyncSplitEvery(asyncReposIter, MAX_PARALLEL_TRAFFIC_CALLS)) {
-      log.info('[getReposImpl]', 'reposChunk.length:', reposChunk.length)
-      const viewsPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, makeTrafficUrl(repo, 'views')))
-      const clonesPromises = reposChunk.map(repo => conditionalRequest(axiosInstance, makeTrafficUrl(repo, 'clones')))
+    for (const rawReposChunk of rawReposInChunks) {
+      log.info('[getReposImpl]', 'rawReposChunk.length:', rawReposChunk.length)
+      const viewsPromises = rawReposChunk.map(rawRepo => conditionalRequest(axiosInstance, makeTrafficUrl(rawRepo, 'views')))
+      const clonesPromises = rawReposChunk.map(rawRepo => conditionalRequest(axiosInstance, makeTrafficUrl(rawRepo, 'clones')))
       const responses = await Promise.all([...viewsPromises, ...clonesPromises])
-      const viewsResults = responses.slice(0, reposChunk.length)
-      const clonesResults = responses.slice(reposChunk.length)
-      reposChunk.forEach((repo: any, index: number) => {
+      const viewsResults = responses.slice(0, rawReposChunk.length)
+      const clonesResults = responses.slice(rawReposChunk.length)
+      rawReposChunk.forEach((rawRepo: any, index: number) => {
         repos.push({
-          id: repo.id,
-          name: repo.name,
-          description: repo.description,
-          createdAt: repo.createdAt,
-          updatedAt: repo.updatedAt,
-          lastCommitAt: repo.defaultBranchRef.target.history.edges[0].node.committedDate,
-          htmlUrl: repo.url,
-          homepageUrl: repo.homepageUrl,
-          language: repo.primaryLanguage?.name,
-          languageColour: repo.primaryLanguage?.color,
-          stars: repo.stargazerCount,
-          forks: repo.forkCount,
+          id: rawRepo.id,
+          name: rawRepo.name,
+          description: rawRepo.description,
+          createdAt: rawRepo.createdAt,
+          updatedAt: rawRepo.updatedAt,
+          lastCommitAt: rawRepo.defaultBranchRef.target.history.edges[0].node.committedDate,
+          htmlUrl: rawRepo.url,
+          homepageUrl: rawRepo.homepageUrl,
+          language: rawRepo.primaryLanguage?.name,
+          languageColour: rawRepo.primaryLanguage?.color,
+          stars: rawRepo.stargazerCount,
+          forks: rawRepo.forkCount,
           views: viewsResults[index].data.count,
           viewers: viewsResults[index].data.uniques,
           clones: clonesResults[index].data.count,
@@ -230,7 +220,9 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
         })
       })
     }
+
     await displayV3RateLimitData(axiosInstance, 'after')
+
     return {
       success: {
         user,
