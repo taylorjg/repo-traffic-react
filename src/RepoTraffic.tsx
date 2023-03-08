@@ -13,8 +13,6 @@ import { GitHubData, RepoData } from './types'
 import { useToast } from './Toast'
 import styled from '@emotion/styled'
 
-const EMPTY_REPOS: RepoData[] = []
-
 // https://github.com/reakit/reakit/issues/466#issuecomment-544344689
 const NetworkActivityProgressBar = styled(({ isActive, ...props }: { isActive: boolean }) => <LinearProgress {...props} />)`
   visibility: ${props => props.isActive ? 'visible' : 'hidden'};
@@ -53,7 +51,7 @@ const RepoTraffic = () => {
 
   const { isFetching, data } = queryResult
 
-  const rows = data?.repos ?? EMPTY_REPOS
+  const rows = data?.repos ?? []
   const userData = data?.user
 
   const onRefresh = () => {
