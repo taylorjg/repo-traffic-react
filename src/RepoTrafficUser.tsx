@@ -7,21 +7,18 @@ const StyledUserRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
 `
 
-const StyledUserRowLabel = styled.span`
-  margin-right: 1rem;
-`
-
-const StyledUserRowValue = styled.span`
-`
+const StyledUserRowLabel = styled.span``
+const StyledUserRowValue = styled.span``
 
 type UserRowProps = {
   label: string
-  value: string
+  value?: string | number
 }
 
-const UserRow: React.FC<UserRowProps> = ({ label, value }) => {
+const UserRow: React.FC<UserRowProps> = ({ label, value = '' }) => {
   return (
     <StyledUserRow>
       <StyledUserRowLabel>{label}:</StyledUserRowLabel>
@@ -31,7 +28,7 @@ const UserRow: React.FC<UserRowProps> = ({ label, value }) => {
 }
 
 export type RepoTrafficUserProps = {
-  userData: UserData
+  userData?: UserData
 }
 
 const RepoTrafficUser: React.FC<RepoTrafficUserProps> = ({ userData }) => {
@@ -46,9 +43,10 @@ const RepoTrafficUser: React.FC<RepoTrafficUserProps> = ({ userData }) => {
         <Typography>User</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <UserRow label="Login" value={userData.login} />
-        <UserRow label="Name" value={userData.name} />
-        <UserRow label="Location" value={userData.location} />
+        <UserRow label="Login" value={userData?.login} />
+        <UserRow label="Name" value={userData?.name} />
+        <UserRow label="Location" value={userData?.location} />
+        <UserRow label="Followers" value={userData?.followers.totalCount} />
       </AccordionDetails>
     </Accordion>
   )

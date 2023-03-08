@@ -22,6 +22,9 @@ const USER_QUERY = gql`
       url
       avatarUrl
       websiteUrl
+      followers {
+        totalCount
+      }
     }
 
     rateLimit {
@@ -71,13 +74,14 @@ const REPOS_QUERY = gql`
                 }
               }
             }
-          }          
+          }
         }
       }
       pageInfo {
         hasNextPage
         endCursor
       }
+      repositoryCount
     }
 
     rateLimit {
@@ -123,7 +127,12 @@ const runReposQuery = async (
     }
 
     const data = await client.request(REPOS_QUERY, variables)
-    log.info('[runReposQuery]', 'rateLimit:', data.rateLimit, 'fetched:', data.search.nodes.length)
+
+    log.info('[runReposQuery]', {
+      rateLimit: data.rateLimit,
+      fetched: data.search.nodes.length,
+      repositoryCount: data.search.repositoryCount
+    })
 
     const hasNextPage = data.search.pageInfo.hasNextPage
     const after = data.search.pageInfo.endCursor
@@ -154,6 +163,29 @@ const displayV3RateLimitData = async (axiosInstance: AxiosInstance, when: string
 
 const makeTrafficUrl = (repo: any, trafficType: string) =>
   `/repos/${repo.owner.login}/${repo.name}/traffic/${trafficType}`
+
+const removeDuplicateRepos = (repos: any[]): any[] => {
+
+  const map = new Map<string, number>()
+  const withoutDups: any[] = []
+
+  for (const repo of repos) {
+    const oldCount = map.get(repo.name) ?? 0
+    const newCount = oldCount + 1
+    map.set(repo.name, newCount)
+    if (newCount === 1) {
+      withoutDups.push(repo)
+    }
+  }
+
+  const dups = Array.from(map.entries()).filter(([, count]) => count > 1)
+
+  if (dups.length > 0) {
+    log.warn('duplicate repos:', dups)
+  }
+
+  return withoutDups
+}
 
 export const getReposImpl = async (clientId: string, clientSecret: string, token: string, repoLimit: number) => {
 
@@ -226,7 +258,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
     return {
       success: {
         user,
-        repos
+        repos: removeDuplicateRepos(repos)
       }
     }
   } catch (e: unknown) {

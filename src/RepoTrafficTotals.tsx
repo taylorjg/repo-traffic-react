@@ -7,14 +7,11 @@ const StyledTotal = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
 `
 
-const StyledTotalLabel = styled.span`
-  margin-right: 1rem;
-`
-
-const StyledTotalValue = styled.span`
-`
+const StyledTotalLabel = styled.span``
+const StyledTotalValue = styled.span``
 
 type TotalProps = {
   label: string

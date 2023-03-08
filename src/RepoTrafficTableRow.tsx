@@ -95,8 +95,8 @@ const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) =
         </AlignedIcon>
       </TableCell>
       <TableCell>
-        <StyledLanguage colour={repoData.languageColour}>
-          {repoData.language}
+        <StyledLanguage colour={repoData.languageColour ?? 'transparent'}>
+          {repoData.language ?? <>&nbsp;</>}
         </StyledLanguage>
       </TableCell>
       <TableCell>{repoData.views.toLocaleString()}</TableCell>

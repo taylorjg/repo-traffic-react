@@ -9,17 +9,11 @@ import RepoTrafficUser from './RepoTrafficUser'
 import RepoTrafficFilter from './RepoTrafficFilter'
 import RepoTrafficMinValue from './RepoTrafficMinValue'
 import RepoTrafficTable from './RepoTrafficTable'
-import { GitHubData, RepoData, UserData } from './types'
+import { GitHubData, RepoData } from './types'
 import { useToast } from './Toast'
 import styled from '@emotion/styled'
 
 const EMPTY_REPOS: RepoData[] = []
-
-const EMPTY_USER: UserData = {
-  login: "",
-  name: "",
-  location: ""
-}
 
 // https://github.com/reakit/reakit/issues/466#issuecomment-544344689
 const NetworkActivityProgressBar = styled(({ isActive, ...props }: { isActive: boolean }) => <LinearProgress {...props} />)`
@@ -60,7 +54,7 @@ const RepoTraffic = () => {
   const { isFetching, data } = queryResult
 
   const rows = data?.repos ?? EMPTY_REPOS
-  const userData = data?.user ?? EMPTY_USER
+  const userData = data?.user
 
   const onRefresh = () => {
     if (!queryResult.isFetching) {
