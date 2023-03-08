@@ -11,7 +11,10 @@ const handlers = [
     return res(
       ctx.json({
         user: {
-          login: "some-login-name"
+          login: "some-login-name",
+          followers: {
+            totalCount: 0
+          }
         },
         repos: [
           {
