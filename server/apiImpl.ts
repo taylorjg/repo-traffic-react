@@ -241,7 +241,7 @@ export const getReposImpl = async (clientId: string, clientSecret: string, token
           lastCommitAt: rawRepo.defaultBranchRef.target.history.edges[0].node.committedDate,
           htmlUrl: rawRepo.url,
           homepageUrl: rawRepo.homepageUrl,
-          language: rawRepo.primaryLanguage?.name,
+          language: rawRepo.primaryLanguage?.name ?? "",
           languageColour: rawRepo.primaryLanguage?.color,
           stars: rawRepo.stargazerCount,
           forks: rawRepo.forkCount,
