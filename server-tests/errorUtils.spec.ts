@@ -39,7 +39,7 @@ describe('errorUtils unit tests', () => {
       }
       const e = await causeAxiosError()
       const actual = getErrorMessage(e)
-      expect(actual).toEqual('Error: connect ECONNREFUSED 127.0.0.1:80')
+      expect(actual).toMatch(/^Error: connect ECONNREFUSED [\d.:]*:80$/)
     })
   })
 })
