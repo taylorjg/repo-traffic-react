@@ -1,3 +1,5 @@
+[![CI/CD](https://github.com/taylorjg/repo-traffic-react/actions/workflows/ci.yml/badge.svg)](https://github.com/taylorjg/repo-traffic-react/actions/workflows/ci.yml)
+
 # Description
 
 I have used `React` for a few years and I have some familiarity with `TypeScript`
