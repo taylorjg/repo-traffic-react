@@ -9,7 +9,7 @@ export type RepoTrafficToolbarProps = {
   onChangeAutoRefreshInterval: (autoRefreshInterval: number) => void
 }
 
-const RepoTrafficToolbar: React.FC<RepoTrafficToolbarProps> = ({
+const RepoTrafficToolbar: React.FunctionComponent<RepoTrafficToolbarProps> = ({
   autoRefreshInterval,
   dataUpdatedAt,
   onRefresh,

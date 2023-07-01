@@ -1,24 +1,15 @@
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
 import { RepoData } from './types'
-import styled from '@emotion/styled'
-
-const StyledTotal = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-`
-
-const StyledTotalLabel = styled.span``
-const StyledTotalValue = styled.span``
+import { StyledTotal, StyledTotalLabel, StyledTotalValue } from "./RepoTrafficTotals.styles";
 
 type TotalProps = {
   label: string
   value: number
 }
 
-const Total: React.FC<TotalProps> = ({ label, value }) => {
+const Total: React.FunctionComponent<TotalProps> = ({ label, value }) => {
   return (
     <StyledTotal>
       <StyledTotalLabel>{label}:</StyledTotalLabel>
@@ -36,7 +27,7 @@ const sumBy = <T,>(xs: T[], fn: (x: T) => number): number => {
   return xs.reduce((acc: number, x: T) => acc + fn(x), 0)
 }
 
-const RepoTrafficTotals: React.FC<RepoTrafficTotalsProps> = ({ label, rows }) => {
+const RepoTrafficTotals: React.FunctionComponent<RepoTrafficTotalsProps> = ({ label, rows }) => {
 
   const totalRepos = rows.length
   const totalViews = sumBy(rows, row => row.views)

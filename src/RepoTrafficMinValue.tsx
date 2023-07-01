@@ -7,7 +7,7 @@ export type RepoTrafficMinValueProps = {
 
 const MIN_VALUES = [1, 10, 100, 1_000, 10_000]
 
-const RepoTrafficMinValue: React.FC<RepoTrafficMinValueProps> = ({ minValue, onChange }) => {
+const RepoTrafficMinValue: React.FunctionComponent<RepoTrafficMinValueProps> = ({ minValue, onChange }) => {
 
   const handleChangeMinValue = (event: SelectChangeEvent<number>) => {
     const minValue = event.target.value as number

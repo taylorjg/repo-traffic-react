@@ -1,19 +1,15 @@
 import { IconButton, InputAdornment, TextField } from '@mui/material'
 import FilterAltIcon from '@mui/icons-material/FilterAlt'
-import styled from '@emotion/styled'
 import ClearIcon from '@mui/icons-material/Clear'
 
-const StyledFilter = styled.div`
-  display: flex;
-  align-items: center;
-`
+import { StyledFilter } from "./RepoTrafficFilter.styles";
 
 export type RepoTrafficFilterProps = {
   value: string
   onChange: (value: string) => void
 }
 
-const RepoTrafficFilter: React.FC<RepoTrafficFilterProps> = ({ value, onChange }) => {
+const RepoTrafficFilter: React.FunctionComponent<RepoTrafficFilterProps> = ({ value, onChange }) => {
 
   return (
     <StyledFilter>

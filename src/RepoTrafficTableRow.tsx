@@ -1,47 +1,26 @@
 import { TableCell, TableRow, Tooltip } from '@mui/material'
+
 import { RepoData } from './types'
-import styled from '@emotion/styled'
+import {
+  StyledLanguage,
+  StyledLink,
+  StyledTooltipLabelCell,
+  StyledTooltipRow,
+  StyledTooltipTable,
+  StyledTooltipValueCell,
+  AlignedIcon
+} from "./RepoTrafficTableRow.styles";
 
 export type RepoTrafficTableRowProps = {
   repoData: RepoData
 }
-
-const StyledLanguage = styled.div<{ colour: string }>`
-  border: ${props => `2px solid ${props.colour}`};
-  text-align: center;
-`
-
-const AlignedIcon = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-const StyledTooltipLabelCell = styled.td`
-  font-weight: bold;
-  vertical-align: top;
-  min-width: 6rem;
-`
-
-const StyledTooltipValueCell = styled.td`
-  word-wrap: anywhere;
-`
-
-const StyledLink = styled.a`
-  color: inherit;
-`
 
 type StyledTooltipRowProps = {
   label: string
   value: string | React.ReactNode
 }
 
-const StyledTooltipTable = styled.table`
-`
-
-const StyledTooltipRow = styled.tr`
-`
-
-const TooltipRow: React.FC<StyledTooltipRowProps> = ({ label, value }) => {
+const TooltipRow: React.FunctionComponent<StyledTooltipRowProps> = ({ label, value }) => {
   return (
     <StyledTooltipRow>
       <StyledTooltipLabelCell>{label}</StyledTooltipLabelCell>
@@ -57,7 +36,7 @@ type RepoTooltipProps = {
   children: React.ReactElement<any, any>
 }
 
-const RepoTooltip: React.FC<RepoTooltipProps> = ({ repoData, children }) => {
+const RepoTooltip: React.FunctionComponent<RepoTooltipProps> = ({ repoData, children }) => {
   return (
     <Tooltip title={
       <StyledTooltipTable>
@@ -79,7 +58,7 @@ const RepoTooltip: React.FC<RepoTooltipProps> = ({ repoData, children }) => {
   )
 }
 
-const RepoTrafficTableRow: React.FC<RepoTrafficTableRowProps> = ({ repoData }) => {
+const RepoTrafficTableRow: React.FunctionComponent<RepoTrafficTableRowProps> = ({ repoData }) => {
   return (
     <TableRow>
       <TableCell>

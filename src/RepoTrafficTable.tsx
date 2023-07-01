@@ -52,7 +52,7 @@ const getComparator = <T, Key extends keyof T>(sortDirection: SortDirection, sor
     : (a, b) => -descendingComparator(a, b, sortBy)
 }
 
-const RepoTrafficTable: React.FC<RepoTrafficTableProps> = ({ rows }) => {
+const RepoTrafficTable: React.FunctionComponent<RepoTrafficTableProps> = ({ rows }) => {
 
   const [sortBy, setSortBy] = useState<keyof RepoData>('views')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')

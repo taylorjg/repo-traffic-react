@@ -1,24 +1,15 @@
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
 import { UserData } from './types'
-import styled from '@emotion/styled'
-
-const StyledUserRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-`
-
-const StyledUserRowLabel = styled.span``
-const StyledUserRowValue = styled.span``
+import { StyledUserRow, StyledUserRowLabel, StyledUserRowValue } from "./RepoTrafficUser.styles"
 
 type UserRowProps = {
   label: string
   value?: string | number
 }
 
-const UserRow: React.FC<UserRowProps> = ({ label, value = '' }) => {
+const UserRow: React.FunctionComponent<UserRowProps> = ({ label, value = '' }) => {
   return (
     <StyledUserRow>
       <StyledUserRowLabel>{label}:</StyledUserRowLabel>
@@ -31,7 +22,7 @@ export type RepoTrafficUserProps = {
   userData?: UserData
 }
 
-const RepoTrafficUser: React.FC<RepoTrafficUserProps> = ({ userData }) => {
+const RepoTrafficUser: React.FunctionComponent<RepoTrafficUserProps> = ({ userData }) => {
 
   const onChange = (_event: React.SyntheticEvent, expanded: boolean) => {
     gtag('event', expanded ? 'open_user' : 'close_user')

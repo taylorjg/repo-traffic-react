@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LinearProgress } from '@mui/material'
 import { useQuery } from 'react-query'
+
 import RepoTrafficToolbar from './RepoTrafficToolbar'
 import RepoTrafficTotals from './RepoTrafficTotals'
 import RepoTrafficUser from './RepoTrafficUser'
@@ -11,19 +11,7 @@ import RepoTrafficMinValue from './RepoTrafficMinValue'
 import RepoTrafficTable from './RepoTrafficTable'
 import { GitHubData, RepoData } from './types'
 import { useToast } from './Toast'
-import styled from '@emotion/styled'
-
-// https://github.com/reakit/reakit/issues/466#issuecomment-544344689
-const NetworkActivityProgressBar = styled(({ isActive, ...props }: { isActive: boolean }) => <LinearProgress {...props} />)`
-  visibility: ${props => props.isActive ? 'visible' : 'hidden'};
-  margin-bottom: 1rem;
-`
-
-const StyledControlBar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-`
+import { StyledControlBar, StyledNetworkActivityProgressBar } from "./RepoTraffic.styles";
 
 const RepoTraffic = () => {
 
@@ -94,7 +82,7 @@ const RepoTraffic = () => {
         isFetching={isFetching}
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />
-      <NetworkActivityProgressBar isActive={isFetching} />
+      <StyledNetworkActivityProgressBar isActive={isFetching} />
       <StyledControlBar>
         <div>
           <RepoTrafficTotals label="Overall Totals" rows={rows} />
