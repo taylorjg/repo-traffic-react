@@ -45,7 +45,8 @@
     "eject": "react-scripts eject",
     "build:server": "tsc -p server",
     "start:server": "ts-node server",
-    "test:server": "npm run build:server && jest server-tests --config server-tests/jest.config.js"
+    "test:server": "npm run build:server && jest server-tests --config server-tests/jest.config.js",
+    "open": "open https://repo-traffic-react.onrender.com"
   },
   "eslintConfig": {
     "extends": [
