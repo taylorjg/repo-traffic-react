@@ -11,7 +11,8 @@ import RepoTrafficMinValue from './RepoTrafficMinValue'
 import RepoTrafficTable from './RepoTrafficTable'
 import { GitHubData, RepoData } from './types'
 import { useToast } from './Toast'
-import { StyledControlBar, StyledNetworkActivityProgressBar } from "./RepoTraffic.styles";
+import { StyledControlBar } from "./RepoTraffic.styles";
+import { NetworkActivityProgressBar } from "./NetworkActivityProgressBar";
 
 const RepoTraffic = () => {
 
@@ -82,7 +83,7 @@ const RepoTraffic = () => {
         isFetching={isFetching}
         onChangeAutoRefreshInterval={onChangeAutoRefreshInterval}
       />
-      <StyledNetworkActivityProgressBar isActive={isFetching} />
+      <NetworkActivityProgressBar isActive={isFetching} />
       <StyledControlBar>
         <div>
           <RepoTrafficTotals label="Overall Totals" rows={rows} />
